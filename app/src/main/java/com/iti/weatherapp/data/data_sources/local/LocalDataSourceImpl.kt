@@ -1,4 +1,22 @@
 package com.iti.weatherapp.data.data_sources.local
 
-class LocalDataSourceImpl : LocalDataSource {
+import com.iti.weatherapp.data.db.FavoriteLocationsDao
+import com.iti.weatherapp.data.db.WeatherAlertsDao
+import com.iti.weatherapp.data.db.entities.FavoriteLocation
+import com.iti.weatherapp.data.db.entities.WeatherAlert
+import javax.inject.Inject
+
+class LocalDataSourceImpl @Inject constructor(
+    private val favoriteLocationsDao: FavoriteLocationsDao,
+    private val weatherAlertsDao: WeatherAlertsDao
+) : LocalDataSource {
+
+    override fun getAllFavoriteLocations() = favoriteLocationsDao.getAllFavoriteLocations()
+    override suspend fun insertFavoriteLocation(location: FavoriteLocation) = favoriteLocationsDao.insertFavoriteLocation(location)
+    override suspend fun deleteFavoriteLocation(location: FavoriteLocation) = favoriteLocationsDao.deleteFavoriteLocation(location)
+
+    override fun getAllWeatherAlerts() = weatherAlertsDao.getAllWeatherAlerts()
+    override suspend fun insertWeatherAlert(alert: WeatherAlert) = weatherAlertsDao.insertWeatherAlert(alert)
+    override suspend fun deleteWeatherAlert(alert: WeatherAlert) = weatherAlertsDao.deleteWeatherAlert(alert)
+    override suspend fun updateWeatherAlert(alert: WeatherAlert) = weatherAlertsDao.updateWeatherAlert(alert)
 }
