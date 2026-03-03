@@ -1,4 +1,4 @@
-package com.iti.weatherapp.data.db
+package com.iti.weatherapp.data.local.db
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.iti.weatherapp.data.db.entities.WeatherAlert
+import com.iti.weatherapp.data.local.db.entities.WeatherAlert
 import kotlinx.coroutines.flow.Flow
 
 @Dao

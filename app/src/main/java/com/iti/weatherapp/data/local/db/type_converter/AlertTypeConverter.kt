@@ -1,7 +1,7 @@
-package com.iti.weatherapp.data.db.type_converter
+package com.iti.weatherapp.data.local.db.type_converter
 
 import androidx.room.TypeConverter
-import com.iti.weatherapp.data.db.entities.AlertType
+import com.iti.weatherapp.data.local.db.entities.AlertType
 
 class AlertTypeConverter {
     

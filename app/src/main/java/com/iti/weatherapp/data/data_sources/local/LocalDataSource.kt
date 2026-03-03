@@ -1,7 +1,7 @@
 package com.iti.weatherapp.data.data_sources.local
 
-import com.iti.weatherapp.data.db.entities.FavoriteLocation
-import com.iti.weatherapp.data.db.entities.WeatherAlert
+import com.iti.weatherapp.data.local.db.entities.FavoriteLocation
+import com.iti.weatherapp.data.local.db.entities.WeatherAlert
 import kotlinx.coroutines.flow.Flow
 
 interface LocalDataSource {

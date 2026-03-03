@@ -1,11 +1,11 @@
-package com.iti.weatherapp.data.db
+package com.iti.weatherapp.data.local.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.iti.weatherapp.data.db.entities.FavoriteLocation
-import com.iti.weatherapp.data.db.entities.WeatherAlert
-import com.iti.weatherapp.data.db.type_converter.AlertTypeConverter
+import com.iti.weatherapp.data.local.db.entities.FavoriteLocation
+import com.iti.weatherapp.data.local.db.entities.WeatherAlert
+import com.iti.weatherapp.data.local.db.type_converter.AlertTypeConverter
 
 @Database(
     entities = [FavoriteLocation::class, WeatherAlert::class],

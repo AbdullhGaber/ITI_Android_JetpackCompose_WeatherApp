@@ -2,8 +2,13 @@ package com.iti.weatherapp.data.repository
 
 import com.iti.weatherapp.data.data_sources.local.LocalDataSource
 import com.iti.weatherapp.data.data_sources.remote.RemoteDataSource
-import com.iti.weatherapp.data.db.entities.FavoriteLocation
-import com.iti.weatherapp.data.db.entities.WeatherAlert
+import com.iti.weatherapp.data.local.db.entities.FavoriteLocation
+import com.iti.weatherapp.data.local.db.entities.WeatherAlert
+import com.iti.weatherapp.data.models.ForecastResponse
+import com.iti.weatherapp.data.utils.ApiState
+import com.iti.weatherapp.data.utils.safeApiCall
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(
@@ -11,8 +16,17 @@ class RepositoryImpl @Inject constructor(
     private val localDataSource: LocalDataSource
 ) : Repository {
 
-    override suspend fun getFiveDayForecast(lat: Double, lon: Double, units: String, lang: String) =
-        remoteDataSource.getFiveDayForecast(lat, lon, units, lang)
+    override fun getFiveDayForecast(
+        lat: Double, lon: Double, units: String, lang: String
+    ): Flow<ApiState<ForecastResponse>> = flow {
+        emit(ApiState.Loading)
+
+        val result = safeApiCall {
+            remoteDataSource.getFiveDayForecast(lat, lon, units, lang)
+        }
+
+        emit(result)
+    }
 
     override fun getAllFavoriteLocations() = localDataSource.getAllFavoriteLocations()
     override suspend fun insertFavoriteLocation(location: FavoriteLocation) = localDataSource.insertFavoriteLocation(location)

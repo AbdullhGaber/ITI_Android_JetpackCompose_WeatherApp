@@ -1,14 +1,16 @@
 package com.iti.weatherapp.data.repository
 
-import com.iti.weatherapp.data.db.entities.FavoriteLocation
-import com.iti.weatherapp.data.db.entities.WeatherAlert
+import com.iti.weatherapp.data.local.db.entities.FavoriteLocation
+import com.iti.weatherapp.data.local.db.entities.WeatherAlert
 import com.iti.weatherapp.data.models.ForecastResponse
+import com.iti.weatherapp.data.utils.ApiState
 import kotlinx.coroutines.flow.Flow
-import retrofit2.Response
 
 interface Repository {
     // Remote
-    suspend fun getFiveDayForecast(lat: Double, lon: Double, units: String, lang: String): Response<ForecastResponse>
+    fun getFiveDayForecast(
+        lat: Double, lon: Double, units: String, lang: String
+    ): Flow<ApiState<ForecastResponse>>
 
     // Local - Favorites
     fun getAllFavoriteLocations(): Flow<List<FavoriteLocation>>
