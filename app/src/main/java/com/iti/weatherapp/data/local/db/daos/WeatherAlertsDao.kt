@@ -1,4 +1,4 @@
-package com.iti.weatherapp.data.local.db
+package com.iti.weatherapp.data.local.db.daos
 
 import androidx.room.Dao
 import androidx.room.Delete

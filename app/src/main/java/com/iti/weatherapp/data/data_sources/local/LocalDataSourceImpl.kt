@@ -1,7 +1,7 @@
 package com.iti.weatherapp.data.data_sources.local
 
-import com.iti.weatherapp.data.local.db.FavoriteLocationsDao
-import com.iti.weatherapp.data.local.db.WeatherAlertsDao
+import com.iti.weatherapp.data.local.db.daos.FavoriteLocationsDao
+import com.iti.weatherapp.data.local.db.daos.WeatherAlertsDao
 import com.iti.weatherapp.data.local.db.entities.FavoriteLocation
 import com.iti.weatherapp.data.local.db.entities.WeatherAlert
 import javax.inject.Inject
