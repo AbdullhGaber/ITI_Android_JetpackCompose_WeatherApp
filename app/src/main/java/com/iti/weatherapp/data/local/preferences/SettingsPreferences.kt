@@ -35,7 +35,7 @@ class SettingsPreferences @Inject constructor(
     }
 
     val windUnitFlow: Flow<String> = context.dataStore.data.map { prefs ->
-        prefs[WIND_UNIT] ?: "meter_sec"
+        prefs[WIND_UNIT] ?: "metric"
     }
 
     val languageFlow: Flow<String> = context.dataStore.data.map { prefs ->
