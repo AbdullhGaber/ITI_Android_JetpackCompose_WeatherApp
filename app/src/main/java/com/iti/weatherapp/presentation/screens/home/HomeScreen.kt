@@ -1,5 +1,8 @@
 package com.iti.weatherapp.presentation.screens.home
 
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -14,42 +17,136 @@ import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.google.android.gms.location.LocationServices
 import com.iti.weatherapp.data.models.ForecastItem
 import com.iti.weatherapp.data.models.ForecastResponse
 import com.iti.weatherapp.presentation.utils.DailyForecastItem
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
-
+import android.Manifest
+import android.os.Looper
+import androidx.compose.runtime.*
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.Priority
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
+    // State to track if we're currently fetching the GPS signal
+    var isFetchingLocation by remember { mutableStateOf(true) }
+    var locationError by remember { mutableStateOf<String?>(null) }
+
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
     val weatherData = viewModel.weatherData.value
     val tempUnitSuffix = WeatherFormatters.getTempSuffix(viewModel.tempUnit.value)
     val windUnitSuffix = WeatherFormatters.getWindSuffix(viewModel.windUnit.value)
 
+    // Helper function to actually grab the GPS coordinates
+    val fetchLocation = {
+        try {
+            // 1. Build an active location request
+            val locationRequest = LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 1000)
+                .setWaitForAccurateLocation(false)
+                .setMinUpdateIntervalMillis(500)
+                .setMaxUpdateDelayMillis(1000)
+                .build()
+
+            // 2. Create a callback to catch the location when it arrives
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    val location = locationResult.lastLocation
+                    if (location != null) {
+                        isFetchingLocation = false
+                        // Trigger the ViewModel with REAL coordinates!
+                        viewModel.getWeatherData(location.latitude, location.longitude)
+
+                        // IMPORTANT: We only need it once, so immediately stop listening
+                        fusedLocationClient.removeLocationUpdates(this)
+                    }
+                }
+            }
+
+            // 3. Start requesting!
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            ).addOnFailureListener {
+                isFetchingLocation = false
+                locationError = "Failed to request location updates: ${it.message}"
+            }
+
+        } catch (e: SecurityException) {
+            isFetchingLocation = false
+            locationError = "Missing location permissions."
+        }
+    }
+
+    // Permission Launcher
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val isGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (isGranted) {
+            fetchLocation()
+        } else {
+            isFetchingLocation = false
+            locationError = "Location permission denied. Please grant permission to see local weather."
+        }
+    }
+
+    // Check permissions as soon as the screen launches
+    LaunchedEffect(Unit) {
+        val hasFineLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val hasCoarseLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+        if (hasFineLocation || hasCoarseLocation) {
+            fetchLocation()
+        } else {
+            permissionLauncher.launch(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+            )
+        }
+    }
+
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background), // Themed background
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        if (isLoading) {
+        if (isFetchingLocation || isLoading) {
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        } else if (locationError != null) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "Error: $locationError", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
+                Button(onClick = {
+                    isFetchingLocation = true
+                    fetchLocation()
+                }) { Text("Retry GPS") }
+            }
         } else if (error != null) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Error: $error", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
-                Button(onClick = { viewModel.getWeatherData(30.0444, 31.2357) }) { Text("Retry") }
+                Text(text = "API Error: $error", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
+                Button(onClick = { fetchLocation() }) { Text("Retry API") }
             }
         } else if (weatherData != null) {
             HomeContent(weatherData, tempUnitSuffix, windUnitSuffix)

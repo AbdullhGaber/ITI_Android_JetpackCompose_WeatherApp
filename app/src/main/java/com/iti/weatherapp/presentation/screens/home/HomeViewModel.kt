@@ -34,10 +34,6 @@ class HomeViewModel @Inject constructor(
     private val _windUnit = mutableStateOf("metric")
     val windUnit: State<String> = _windUnit
 
-    init {
-        getWeatherData(30.0444, 31.2357)
-    }
-
     fun getWeatherData(lat: Double, lon: Double) {
         viewModelScope.launch {
             _tempUnit.value = settingsPreferences.tempUnitFlow.first()
