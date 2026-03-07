@@ -1,6 +1,7 @@
 package com.iti.weatherapp.presentation.screens.home
 
-import android.content.pm.PackageManager
+
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -18,7 +19,6 @@ import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +28,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.google.android.gms.location.LocationServices
@@ -36,13 +35,11 @@ import com.iti.weatherapp.data.models.ForecastItem
 import com.iti.weatherapp.data.models.ForecastResponse
 import com.iti.weatherapp.presentation.utils.DailyForecastItem
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
-import android.Manifest
-import android.os.Looper
 import androidx.compose.runtime.*
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.Priority
+import com.iti.weatherapp.presentation.utils.LocationUtils
+import com.iti.weatherapp.presentation.utils.PermissionUtils
+import kotlinx.coroutines.launch
+
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
@@ -50,103 +47,60 @@ fun HomeScreen(
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
-    // State to track if we're currently fetching the GPS signal
-    var isFetchingLocation by remember { mutableStateOf(true) }
-    var locationError by remember { mutableStateOf<String?>(null) }
-
+    // UI States
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
     val weatherData = viewModel.weatherData.value
     val tempUnitSuffix = WeatherFormatters.getTempSuffix(viewModel.tempUnit.value)
     val windUnitSuffix = WeatherFormatters.getWindSuffix(viewModel.windUnit.value)
+    val scope = rememberCoroutineScope()
 
-    // Helper function to actually grab the GPS coordinates
     val fetchLocation = {
-        try {
-            // 1. Build an active location request
-            val locationRequest = LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 1000)
-                .setWaitForAccurateLocation(false)
-                .setMinUpdateIntervalMillis(500)
-                .setMaxUpdateDelayMillis(1000)
-                .build()
-
-            // 2. Create a callback to catch the location when it arrives
-            val locationCallback = object : LocationCallback() {
-                override fun onLocationResult(locationResult: LocationResult) {
-                    val location = locationResult.lastLocation
-                    if (location != null) {
-                        isFetchingLocation = false
-                        // Trigger the ViewModel with REAL coordinates!
-                        viewModel.getWeatherData(location.latitude, location.longitude)
-
-                        // IMPORTANT: We only need it once, so immediately stop listening
-                        fusedLocationClient.removeLocationUpdates(this)
-                    }
-                }
+        scope.launch {
+            val location = LocationUtils.getCurrentLocation(fusedLocationClient)
+            if (location != null) {
+                viewModel.getWeatherData(location.latitude, location.longitude)
+            } else {
+                viewModel.getWeatherData(31.2001, 29.9187)
+                Toast.makeText(context, "Fallback called", Toast.LENGTH_SHORT).show()
             }
-
-            // 3. Start requesting!
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
-            ).addOnFailureListener {
-                isFetchingLocation = false
-                locationError = "Failed to request location updates: ${it.message}"
-            }
-
-        } catch (e: SecurityException) {
-            isFetchingLocation = false
-            locationError = "Missing location permissions."
         }
     }
 
     // Permission Launcher
     val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
+        contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val isGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        if (isGranted) {
+        val granted = permissions.values.any { it }
+        if (granted) {
             fetchLocation()
         } else {
-            isFetchingLocation = false
-            locationError = "Location permission denied. Please grant permission to see local weather."
+            // Permission denied -> Fallback to Alexandria
+            viewModel.getWeatherData(31.2001, 29.9187)
         }
     }
 
-    // Check permissions as soon as the screen launches
+    // Check permissions on screen load
     LaunchedEffect(Unit) {
-        val hasFineLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val hasCoarseLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-
-        if (hasFineLocation || hasCoarseLocation) {
+        if (PermissionUtils.hasLocationPermissions(context)) {
             fetchLocation()
         } else {
-            permissionLauncher.launch(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-            )
+            permissionLauncher.launch(PermissionUtils.locationPermissions)
         }
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        if (isFetchingLocation || isLoading) {
+        if (isLoading && weatherData == null) {
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-        } else if (locationError != null) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Error: $locationError", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
-                Button(onClick = {
-                    isFetchingLocation = true
-                    fetchLocation()
-                }) { Text("Retry GPS") }
-            }
         } else if (error != null) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "API Error: $error", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
-                Button(onClick = { fetchLocation() }) { Text("Retry API") }
+                Text(text = "Error: $error", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
+                Button(onClick = { fetchLocation() }) { Text("Retry") }
             }
         } else if (weatherData != null) {
             HomeContent(weatherData, tempUnitSuffix, windUnitSuffix)
@@ -223,7 +177,9 @@ fun MainWeatherCard(forecast: ForecastItem, tempUnitSuffix: String, windUnitSuff
                 AsyncImage(
                     model = "https://openweathermap.org/img/wn/${forecast.weatherConditions.first().icon}@4x.png",
                     contentDescription = forecast.weatherConditions.first().description,
-                    modifier = Modifier.size(120.dp).offset(x = (-10).dp)
+                    modifier = Modifier
+                        .size(120.dp)
+                        .offset(x = (-10).dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(verticalArrangement = Arrangement.Center) {
@@ -244,7 +200,9 @@ fun MainWeatherCard(forecast: ForecastItem, tempUnitSuffix: String, windUnitSuff
             Spacer(modifier = Modifier.height(24.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
@@ -265,13 +223,17 @@ fun MainWeatherCard(forecast: ForecastItem, tempUnitSuffix: String, windUnitSuff
                 }
 
                 VerticalDivider(
-                    modifier = Modifier.fillMaxHeight().padding(vertical = 8.dp),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(vertical = 8.dp),
                     color = MaterialTheme.colorScheme.outlineVariant,
                     thickness = 1.dp
                 )
 
                 Column(
-                    modifier = Modifier.weight(1f).padding(start = 16.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 16.dp),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     HorizontalWeatherMetricItem(
@@ -345,7 +307,11 @@ fun HourlyItem(item: ForecastItem, tempUnitSuffix: String, timezoneOffset: Int, 
             .height(110.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(if (isFirstItem) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface)
-            .border(width = 1.dp, color = if (isFirstItem) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else Color.Transparent, shape = RoundedCornerShape(16.dp))
+            .border(
+                width = 1.dp,
+                color = if (isFirstItem) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else Color.Transparent,
+                shape = RoundedCornerShape(16.dp)
+            )
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
