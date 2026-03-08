@@ -1,57 +1,51 @@
 package com.iti.weatherapp.presentation.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+
+
+// Define new AppTheme enum for ViewModel interaction
+enum class AppTheme { LIGHT, DARK, SYSTEM_DEFAULT }
 
 private val LightColorScheme = lightColorScheme(
-    primary = PrimaryBlue,
-    background = LightBackground,
-    surface = LightSurface,
-    onSurface = LightTextPrimary,
-    onSurfaceVariant = LightTextSecondary,
-    tertiary = AccentOrange,
-    secondary = TealAccent,
-    outlineVariant = LightDivider
+    primary = Primary_Blue,
+    background = Background_Light,
+    surface = Surface_Light,
+    onSurface = Text_Primary_Light,
+    onSurfaceVariant = Text_Secondary_Light,
+    tertiary = Accent_Amber,
+    outline = Border_Light,
+    secondaryContainer = Primary_Blue.copy(alpha = 0.1f), // For selected bubbles
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryBlue,
-    background = DarkBackground,
-    surface = DarkSurface,
-    onSurface = DarkTextPrimary,
-    onSurfaceVariant = DarkTextSecondary,
-    tertiary = AccentOrange,
-    secondary = TealAccent,
-    outlineVariant = DarkDivider
+    primary = Primary_Blue,
+    background = Background_Dark,
+    surface = Surface_Dark,
+    onSurface = Text_Primary_Dark,
+    onSurfaceVariant = Text_Secondary_Dark,
+    tertiary = Accent_Amber,
+    outline = Border_Dark,
+    secondaryContainer = Primary_Blue.copy(alpha = 0.2f), // For selected bubbles
 )
 
 @Composable
 fun WeatherAppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false,
+    appTheme: AppTheme = AppTheme.SYSTEM_DEFAULT,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    // Determine the color scheme based on the selected setting
+    val colorScheme = when (appTheme) {
+        AppTheme.SYSTEM_DEFAULT -> if (isSystemInDarkTheme()) DarkColorScheme else LightColorScheme
+        AppTheme.LIGHT -> LightColorScheme
+        AppTheme.DARK -> DarkColorScheme
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
         content = content
     )
 }

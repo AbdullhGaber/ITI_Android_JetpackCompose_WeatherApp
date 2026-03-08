@@ -82,10 +82,22 @@ object WeatherFormatters {
 
     fun getWindSuffix(unit: String): String {
         return when (unit) {
-            "metric" -> "m/s"
-            "imperial" -> "mph"
+            "meter_sec" -> "m/s"
+            "miles_hour" -> "mph"
             else -> ""
         }
+    }
+
+    fun getConvertedWindSpeed(apiSpeed: Double, tempUnit: String, windUnit: String): String {
+        val apiGaveMph = tempUnit == "imperial"
+
+        val finalSpeed = when {
+            apiGaveMph && (windUnit == "meter_sec") -> apiSpeed * 0.44704
+            !apiGaveMph && (windUnit == "miles_hour") -> apiSpeed * 2.23694
+            else -> apiSpeed
+        }
+
+        return finalSpeed.toInt().toString()
     }
 }
 

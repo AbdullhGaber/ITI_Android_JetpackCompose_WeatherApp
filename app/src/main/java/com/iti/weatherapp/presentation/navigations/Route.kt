@@ -11,3 +11,5 @@ object Alerts
 @Serializable
 object Settings
 
+@Serializable
+object MapPick

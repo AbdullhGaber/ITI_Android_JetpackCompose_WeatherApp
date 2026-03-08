@@ -53,6 +53,8 @@ fun HomeScreen(
     val weatherData = viewModel.weatherData.value
     val tempUnitSuffix = WeatherFormatters.getTempSuffix(viewModel.tempUnit.value)
     val windUnitSuffix = WeatherFormatters.getWindSuffix(viewModel.windUnit.value)
+    val tempUnitPref = viewModel.tempUnit.value
+    val windUnitPref = viewModel.windUnit.value
     val scope = rememberCoroutineScope()
 
     val fetchLocation = {
@@ -103,7 +105,7 @@ fun HomeScreen(
                 Button(onClick = { fetchLocation() }) { Text("Retry") }
             }
         } else if (weatherData != null) {
-            HomeContent(weatherData, tempUnitSuffix, windUnitSuffix)
+            HomeContent(weatherData, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix)
         }
     }
 }
@@ -111,6 +113,8 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     forecast: ForecastResponse,
+    tempUnitPref: String,
+    windUnitPref: String,
     tempUnitSuffix: String,
     windUnitSuffix: String
 ) {
@@ -128,13 +132,13 @@ fun HomeContent(
             HeaderSection(forecast.city.name, exactCurrentTimeSeconds, timezoneOffset)
         }
         item {
-            MainWeatherCard(currentForecast, tempUnitSuffix, windUnitSuffix, timezoneOffset)
+            MainWeatherCard(currentForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset)
         }
         item {
             HourlyForecastSection(forecast.forecastList.take(8), tempUnitSuffix, timezoneOffset)
         }
         item {
-            DailyForecastSection(dailyForecast, tempUnitSuffix, windUnitSuffix, timezoneOffset)
+            DailyForecastSection(dailyForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset)
         }
         item {
             Spacer(modifier = Modifier.height(100.dp))
@@ -158,7 +162,14 @@ fun HeaderSection(cityName: String, timestamp: Long, timezoneOffset: Int) {
 }
 
 @Composable
-fun MainWeatherCard(forecast: ForecastItem, tempUnitSuffix: String, windUnitSuffix: String, timezoneOffset: Int) {
+fun MainWeatherCard(forecast: ForecastItem,
+                    tempUnitPref: String,
+                    windUnitPref: String,
+                    tempUnitSuffix: String,
+                    windUnitSuffix: String,
+                    timezoneOffset: Int
+){
+    val accurateWindSpeed = WeatherFormatters.getConvertedWindSpeed(forecast.wind.speed, tempUnitPref, windUnitPref)
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -216,7 +227,7 @@ fun MainWeatherCard(forecast: ForecastItem, tempUnitSuffix: String, windUnitSuff
                     )
                     VerticalWeatherMetricItem(
                         label = "Wind Speed",
-                        value = "${forecast.wind.speed.toInt()} $windUnitSuffix",
+                        value = "$accurateWindSpeed $windUnitSuffix",
                         icon = { Icon(Icons.Outlined.Air, contentDescription = null, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.secondary) },
                         valueColor = MaterialTheme.colorScheme.primary // Use primary blue for the wind value to match design
                     )
@@ -327,20 +338,35 @@ fun HourlyItem(item: ForecastItem, tempUnitSuffix: String, timezoneOffset: Int, 
 }
 
 @Composable
-fun DailyForecastSection(dailyItems: List<DailyForecastItem>, tempUnitSuffix: String, windUnitSuffix: String, timezoneOffset: Int) {
+fun DailyForecastSection(
+    dailyItems: List<DailyForecastItem>,
+    tempUnitPref: String,
+    windUnitPref: String,
+    tempUnitSuffix: String,
+    windUnitSuffix: String,
+    timezoneOffset: Int
+) {
     Column {
         Text(text = "5-DAY FORECAST", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(modifier = Modifier.height(8.dp))
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             dailyItems.forEach { item ->
-                DailyItem(item, tempUnitSuffix, windUnitSuffix, timezoneOffset)
+                DailyItem(item, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset)
             }
         }
     }
 }
 
 @Composable
-fun DailyItem(item: DailyForecastItem, tempUnitSuffix: String, windUnitSuffix: String, timezoneOffset: Int) {
+fun DailyItem(
+    item: DailyForecastItem,
+    tempUnitPref: String,
+    windUnitPref: String,
+    tempUnitSuffix: String,
+    windUnitSuffix: String,
+    timezoneOffset: Int
+) {
+    val accurateWindSpeed = WeatherFormatters.getConvertedWindSpeed(item.windSpeed, tempUnitPref, windUnitPref)
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -360,7 +386,7 @@ fun DailyItem(item: DailyForecastItem, tempUnitSuffix: String, windUnitSuffix: S
                     modifier = Modifier.size(25.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "${item.description}, Hum ${item.humidity}%, Wind ${item.windSpeed.toInt()}${windUnitSuffix}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "${item.description}, Hum ${item.humidity}%, Wind $accurateWindSpeed $windUnitSuffix", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

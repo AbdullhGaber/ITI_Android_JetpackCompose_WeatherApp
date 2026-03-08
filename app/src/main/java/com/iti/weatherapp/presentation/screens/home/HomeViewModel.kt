@@ -31,7 +31,7 @@ class HomeViewModel @Inject constructor(
     private val _tempUnit = mutableStateOf("metric")
     val tempUnit: State<String> = _tempUnit
     
-    private val _windUnit = mutableStateOf("metric")
+    private val _windUnit = mutableStateOf("meter_sec")
     val windUnit: State<String> = _windUnit
 
     fun getWeatherData(lat: Double, lon: Double) {

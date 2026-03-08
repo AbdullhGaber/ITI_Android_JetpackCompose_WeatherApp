@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.iti.weatherapp.presentation.EmptyScreen
 import com.iti.weatherapp.presentation.screens.home.HomeScreen
+import com.iti.weatherapp.presentation.screens.settings.SettingsScreen
 
 @Composable
 fun WeatherNavHost(
@@ -22,6 +23,6 @@ fun WeatherNavHost(
         composable<Home> { HomeScreen() }
         composable<Favorites> { EmptyScreen("Favorites Screen") }
         composable<Alerts> { EmptyScreen("Alerts Screen") }
-        composable<Settings> { EmptyScreen("Settings Screen") }
+        composable<Settings> { SettingsScreen() }
     }
 }
