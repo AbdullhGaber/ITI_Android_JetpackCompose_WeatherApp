@@ -97,7 +97,7 @@ object WeatherFormatters {
             else -> apiSpeed
         }
 
-        return finalSpeed.toInt().toString()
+        return "%.2f".format(finalSpeed)
     }
 }
 

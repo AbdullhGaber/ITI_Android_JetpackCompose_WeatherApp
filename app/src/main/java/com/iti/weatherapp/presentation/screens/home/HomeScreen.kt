@@ -47,7 +47,6 @@ fun HomeScreen(
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
-    // UI States
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
     val weatherData = viewModel.weatherData.value
@@ -69,7 +68,6 @@ fun HomeScreen(
         }
     }
 
-    // Permission Launcher
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -82,7 +80,6 @@ fun HomeScreen(
         }
     }
 
-    // Check permissions on screen load
     LaunchedEffect(Unit) {
         if (PermissionUtils.hasLocationPermissions(context)) {
             fetchLocation()
@@ -229,7 +226,7 @@ fun MainWeatherCard(forecast: ForecastItem,
                         label = "Wind Speed",
                         value = "$accurateWindSpeed $windUnitSuffix",
                         icon = { Icon(Icons.Outlined.Air, contentDescription = null, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.secondary) },
-                        valueColor = MaterialTheme.colorScheme.primary // Use primary blue for the wind value to match design
+                        valueColor = MaterialTheme.colorScheme.primary
                     )
                 }
 
