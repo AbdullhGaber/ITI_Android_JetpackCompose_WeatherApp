@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.dagger.hilt)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.material3)
     ksp(libs.hilt.compiler)
 
     implementation(libs.androidx.room.runtime)

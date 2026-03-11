@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">تطبيق الطقس</string>
+    <string name="settings_title">الإعدادات</string>
+    <string name="location_settings">إعدادات الموقع</string>
+    <string name="location_desc">قم بتكوين طريقة الموقع الخاصة بك. استخدم GPS لمعرفة الطقس المحلي بدقة، أو اختر موقعًا مخصصًا من الخريطة.</string>
+    <string name="use_gps">استخدام GPS</string>
+    <string name="select_map">اختر من الخريطة</string>
+    <string name="unit_preferences">تفضيلات الوحدات</string>
+    <string name="temperature">درجة الحرارة</string>
+    <string name="wind_speed">سرعة الرياح</string>
+    <string name="theme_language">المظهر واللغة</string>
+    <string name="app_appearance">مظهر التطبيق</string>
+    <string name="light_mode">الوضع الفاتح</string>
+    <string name="dark_mode">الوضع الداكن</string>
+    <string name="device_settings">استخدام إعدادات الجهاز</string>
+    <string name="language">اللغة</string>
+    <string name="english">الإنجليزية</string>
+    <string name="arabic">العربية</string>
+    <string name="device_language">استخدام لغة الجهاز</string>
+    <string name="hourly_forecast">توقعات كل ساعة</string>
+    <string name="five_day_forecast">توقعات لمدة 5 أيام</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="pressure">الضغط</string>
+    <string name="clouds">الغيوم</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="retry_gps">إعادة محاولة GPS</string>
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_favorites">المفضلة</string>
+    <string name="nav_alerts">التنبيهات</string>
+    <string name="nav_settings">الإعدادات</string>
+    <string name="error">خطأ</string>
+    <string name="hum_short">رطوبة</string>
+    <string name="wind_short">رياح</string>
+    <string name="fallback_called">تم استدعاء الموقع الافتراضي</string>
+    <string name="temp_c">°C</string>
+    <string name="temp_f">°F</string>
+    <string name="temp_k">K</string>
+    <string name="wind_ms">م/ث</string>
+    <string name="wind_mph">ميل/س</string>
+    <string name="pressure_unit">هكتوباسكال</string>
+</resources>

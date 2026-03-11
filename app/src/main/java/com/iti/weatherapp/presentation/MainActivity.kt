@@ -1,9 +1,9 @@
 package com.iti.weatherapp.presentation
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -16,12 +16,14 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -29,27 +31,31 @@ import androidx.navigation.compose.rememberNavController
 import com.iti.weatherapp.presentation.navigations.Home
 import com.iti.weatherapp.presentation.navigations.TelegramBottomNavItem
 import com.iti.weatherapp.presentation.navigations.WeatherNavHost
-import com.iti.weatherapp.presentation.navigations.components.bottomNavItems
+import com.iti.weatherapp.presentation.navigations.components.getBottomNavItems
+import com.iti.weatherapp.presentation.ui.theme.AppTheme
 import com.iti.weatherapp.presentation.ui.theme.WeatherAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+    lateinit var viewModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            viewModel = hiltViewModel()
+            val appTheme by viewModel.appTheme.collectAsState(initial = AppTheme.SYSTEM_DEFAULT)
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
 
-            WeatherAppTheme {
+            WeatherAppTheme(appTheme = appTheme){
                 Scaffold(
                     bottomBar = {
                         NavigationBar(
-                            windowInsets = WindowInsets(
-                                bottom = 16.dp
-                            ),
+                            windowInsets = WindowInsets(bottom = 16.dp),
                             modifier = Modifier
                                 .padding(horizontal = 16.dp, vertical = 16.dp)
                                 .clip(RoundedCornerShape(24.dp))
@@ -58,7 +64,7 @@ class MainActivity : ComponentActivity() {
                             contentColor = MaterialTheme.colorScheme.onSurface,
                             tonalElevation = 16.dp,
                         ){
-                            bottomNavItems.forEach { item ->
+                            getBottomNavItems().forEach { item ->
                                 val isSelected = currentDestination?.hierarchy?.any {
                                     it.hasRoute(item.route::class)
                                 } == true
