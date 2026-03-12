@@ -49,6 +49,9 @@ fun HomeScreen(
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
+    val locationMethod by viewModel.locationMethod.collectAsState()
+    val customLocation by viewModel.customLocation.collectAsState()
+
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
     val weatherData = viewModel.weatherData.value
@@ -59,14 +62,17 @@ fun HomeScreen(
     val windUnitPref = viewModel.windUnit.value
     val scope = rememberCoroutineScope()
 
-    val fetchLocation = {
+    val fallBackMessage = stringResource(R.string.fallback_called)
+
+    val fetchGpsLocation = {
         scope.launch {
             val location = LocationUtils.getCurrentLocation(fusedLocationClient)
             if (location != null) {
                 viewModel.getWeatherData(location.latitude, location.longitude)
             } else {
+                // GPS failed, fallback to Alexandria
                 viewModel.getWeatherData(31.2001, 29.9187)
-                Toast.makeText(context, context.getString(R.string.fallback_called), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, fallBackMessage, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -76,18 +82,26 @@ fun HomeScreen(
     ) { permissions ->
         val granted = permissions.values.any { it }
         if (granted) {
-            fetchLocation()
+            fetchGpsLocation()
         } else {
             viewModel.getWeatherData(31.2001, 29.9187)
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (PermissionUtils.hasLocationPermissions(context)) {
-            fetchLocation()
+    val triggerWeatherUpdate = {
+        if (locationMethod == "map") {
+            viewModel.getWeatherData(customLocation.first, customLocation.second)
         } else {
-            permissionLauncher.launch(PermissionUtils.locationPermissions)
+            if (PermissionUtils.hasLocationPermissions(context)) {
+                fetchGpsLocation()
+            } else {
+                permissionLauncher.launch(PermissionUtils.locationPermissions)
+            }
         }
+    }
+
+    LaunchedEffect(locationMethod, customLocation) {
+        triggerWeatherUpdate()
     }
 
     Box(
@@ -105,18 +119,18 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(16.dp)
                 )
-                Button(onClick = { fetchLocation() }) {
+                Button(onClick = { triggerWeatherUpdate() }) {
                     Text(stringResource(R.string.retry))
                 }
             }
         } else if (weatherData != null) {
             HomeContent(
-                weatherData,
-                tempUnitPref,
-                windUnitPref,
-                tempUnitSuffix,
-                windUnitSuffix,
-                onRefresh = { fetchLocation() },
+                forecast = weatherData,
+                tempUnitPref = tempUnitPref,
+                windUnitPref = windUnitPref,
+                tempUnitSuffix = tempUnitSuffix,
+                windUnitSuffix = windUnitSuffix,
+                onRefresh = { triggerWeatherUpdate() },
                 isRefreshing = isLoading
             )
         }

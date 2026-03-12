@@ -3,7 +3,6 @@ package com.iti.weatherapp.presentation.screens.map
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,10 +17,13 @@ import com.google.maps.android.compose.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapPickScreen(
+    initialLat: Double,
+    initialLng: Double,
     onBack: () -> Unit,
     onPlacePicked: (Double, Double) -> Unit
 ) {
-    val defaultLocation = LatLng(31.2001, 29.9187)
+    val defaultLocation = LatLng(initialLat, initialLng)
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(defaultLocation, 10f)
     }
@@ -71,13 +73,13 @@ fun MapPickScreen(
                     pickedPoint = latLng
                 }
             ) {
-                pickedPoint?.let { point ->
-                    Marker(
-                        state = MarkerState(position = point),
-                        title = "Selected Location",
-                        snippet = "Tap the checkmark button to save"
-                    )
-                }
+                val markerPosition = pickedPoint ?: defaultLocation
+
+                Marker(
+                    state = MarkerState(position = markerPosition),
+                    title = if (pickedPoint != null) "Selected Location" else "Saved Location",
+                    snippet = if (pickedPoint != null) "Tap the checkmark button to save" else "Tap anywhere to change"
+                )
             }
 
             if (pickedPoint == null) {

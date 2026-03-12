@@ -3,6 +3,7 @@ package com.iti.weatherapp.data.local.preferences
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -27,6 +28,9 @@ class SettingsPreferences @Inject constructor(
         val UNIT_WIND_SPEED = stringPreferencesKey("unit_wind")
         val APP_THEME = stringPreferencesKey("app_theme")
         val APP_LANGUAGE = stringPreferencesKey("app_language")
+
+        val CUSTOM_LAT = doublePreferencesKey("custom_lat")
+        val CUSTOM_LNG = doublePreferencesKey("custom_lng")
     }
     val locationMethodFlow: Flow<String> = context.dataStore.data.map { prefs -> prefs[LOCATION_METHOD] ?: "gps" }
     val tempUnitFlow: Flow<String> = context.dataStore.data.map { prefs -> prefs[UNIT_TEMP] ?: "metric" }
@@ -36,6 +40,12 @@ class SettingsPreferences @Inject constructor(
     val themeFlow: Flow<AppTheme> = context.dataStore.data.map {
         val storedValue = it[APP_THEME] ?: AppTheme.SYSTEM_DEFAULT.name
         AppTheme.valueOf(storedValue)
+    }
+
+    val customLocationFlow: Flow<Pair<Double, Double>> = context.dataStore.data.map { prefs ->
+        val lat = prefs[CUSTOM_LAT] ?: 31.2001
+        val lng = prefs[CUSTOM_LNG] ?: 29.9187
+        Pair(lat, lng)
     }
 
     suspend fun saveLocationMethod(method: String) {
@@ -51,4 +61,12 @@ class SettingsPreferences @Inject constructor(
     }
     suspend fun saveLanguage(lang: String) = context.dataStore.edit { it[APP_LANGUAGE] = lang }
     suspend fun saveTheme(theme: AppTheme) = context.dataStore.edit { it[APP_THEME] = theme.name }
+
+    suspend fun saveCustomLocation(lat : Double, lng : Double){
+        context.dataStore.edit { prefs ->
+            prefs[CUSTOM_LAT] = lat
+            prefs[CUSTOM_LNG] = lng
+            prefs[LOCATION_METHOD] = "map"
+        }
+    }
 }

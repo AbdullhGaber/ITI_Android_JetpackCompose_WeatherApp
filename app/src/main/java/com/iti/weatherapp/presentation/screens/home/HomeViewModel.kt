@@ -9,7 +9,9 @@ import com.iti.weatherapp.data.models.ForecastResponse
 import com.iti.weatherapp.data.repository.Repository
 import com.iti.weatherapp.data.utils.ApiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,6 +29,12 @@ class HomeViewModel @Inject constructor(
 
     private val _weatherData = mutableStateOf<ForecastResponse?>(null)
     val weatherData: State<ForecastResponse?> = _weatherData
+
+    val locationMethod = settingsPreferences.locationMethodFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "gps")
+
+    val customLocation = settingsPreferences.customLocationFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Pair(31.2001, 29.9187))
 
     private val _tempUnit = mutableStateOf("metric")
     val tempUnit: State<String> = _tempUnit

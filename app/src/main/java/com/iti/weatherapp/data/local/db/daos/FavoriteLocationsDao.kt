@@ -20,6 +20,6 @@ interface FavoriteLocationsDao {
     @Delete
     suspend fun deleteFavoriteLocation(location: FavoriteLocation)
 
-    @Query("SELECT * FROM favorite_locations WHERE cityName = :name LIMIT 1")
-    suspend fun getLocationByName(name: String): FavoriteLocation?
+    @Query("SELECT * FROM favorite_locations WHERE latitude = :lat AND longitude = :lon LIMIT 1")
+    suspend fun getLocationByCoordinates(lat: Double, lon: Double): FavoriteLocation?
 }
