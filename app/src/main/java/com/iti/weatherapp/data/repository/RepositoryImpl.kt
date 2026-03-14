@@ -16,13 +16,13 @@ class RepositoryImpl @Inject constructor(
     private val localDataSource: LocalDataSource
 ) : Repository {
 
-    override fun getFiveDayForecast(
+    override fun getWeatherForecast(
         lat: Double, lon: Double, units: String, lang: String
     ): Flow<ApiState<ForecastResponse>> = flow {
         emit(ApiState.Loading)
 
         val result = safeApiCall {
-            remoteDataSource.getFiveDayForecast(lat, lon, units, lang)
+            remoteDataSource.getWeatherForecast(lat, lon, units, lang)
         }
 
         emit(result)
@@ -33,7 +33,8 @@ class RepositoryImpl @Inject constructor(
     override suspend fun deleteFavoriteLocation(location: FavoriteLocation) = localDataSource.deleteFavoriteLocation(location)
 
     override fun getAllWeatherAlerts() = localDataSource.getAllWeatherAlerts()
-    override suspend fun insertWeatherAlert(alert: WeatherAlert) = localDataSource.insertWeatherAlert(alert)
+    override suspend fun insertWeatherAlert(alert: WeatherAlert): Long = localDataSource.insertWeatherAlert(alert)
     override suspend fun deleteWeatherAlert(alert: WeatherAlert) = localDataSource.deleteWeatherAlert(alert)
+    override suspend fun getAlertById(id: Int): WeatherAlert? = localDataSource.getAlertById(id)
     override suspend fun updateWeatherAlert(alert: WeatherAlert) = localDataSource.updateWeatherAlert(alert)
 }

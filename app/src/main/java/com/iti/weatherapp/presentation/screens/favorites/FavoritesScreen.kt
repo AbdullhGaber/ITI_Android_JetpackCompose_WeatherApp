@@ -1,5 +1,6 @@
 package com.iti.weatherapp.presentation.screens.favorites
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.iti.weatherapp.R
 import com.iti.weatherapp.data.local.db.entities.FavoriteLocation
+import com.iti.weatherapp.presentation.LocalBottomPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,11 +35,14 @@ fun FavoritesScreen(
     onNavigateToDetails: (Double, Double, String) -> Unit
 ) {
     val favorites by viewModel.favoritesList.collectAsState()
+    val dynamicBottomPadding = LocalBottomPadding.current
 
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNavigateToMap,
+                modifier = Modifier.padding(bottom = dynamicBottomPadding),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White,
                 shape = RoundedCornerShape(16.dp)
@@ -46,11 +51,10 @@ fun FavoritesScreen(
             }
         },
         containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
             Text(
@@ -72,7 +76,7 @@ fun FavoritesScreen(
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(bottom = 100.dp) // Space for Bottom Nav
+                    contentPadding = PaddingValues(bottom = dynamicBottomPadding + 16.dp)
                 ) {
                     items(
                         items = favorites,

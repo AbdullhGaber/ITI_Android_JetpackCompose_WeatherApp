@@ -8,10 +8,9 @@ import javax.inject.Inject
 class RemoteDataSourceImpl @Inject constructor(
     private val apiService: WeatherApiService
 ) : RemoteDataSource {
-
-    override suspend fun getFiveDayForecast(
+    override suspend fun getWeatherForecast(
         lat: Double, lon: Double, units: String, lang: String
     ): Response<ForecastResponse> {
-        return apiService.getFiveDayForecast(lat, lon, units, lang)
+        return apiService.getWeatherForecast(lat, lon, units, lang)
     }
 }

@@ -50,7 +50,7 @@ class HomeViewModel @Inject constructor(
             val units = _tempUnit.value
             val language = settingsPreferences.languageFlow.first()
 
-            repository.getFiveDayForecast(lat, lon, units, language).collect { state ->
+            repository.getWeatherForecast(lat, lon, units, language).collect { state ->
                 when (state) {
                     is ApiState.Loading -> {
                         _isLoading.value = true
@@ -66,6 +66,7 @@ class HomeViewModel @Inject constructor(
                         _isLoading.value = false
                         _error.value = null
                         _weatherData.value = state.data
+                        settingsPreferences.saveCustomLocation(lat,lon)
                     }
                 }
             }

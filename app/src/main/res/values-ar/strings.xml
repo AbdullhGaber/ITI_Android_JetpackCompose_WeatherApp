@@ -39,4 +39,14 @@
     <string name="wind_ms">م/ث</string>
     <string name="wind_mph">ميل/س</string>
     <string name="pressure_unit">هكتوباسكال</string>
+    <string name="alerts_title">التنبيهات</string>
+    <string name="add_alert">إضافة تنبيه</string>
+    <string name="start_time">وقت البدء</string>
+    <string name="end_time">وقت الانتهاء</string>
+    <string name="notification">إشعار</string>
+    <string name="alarm">منبه</string>
+    <string name="save">حفظ</string>
+    <string name="cancel">إلغاء</string>
+    <string name="no_alerts">لا توجد تنبيهات مجدولة حتى الآن.\nاضغط على + لإضافة واحد.</string>
+    <string name="cancel_alarm">الغاء المنبه</string>
 </resources>

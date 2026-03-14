@@ -106,6 +106,14 @@ object WeatherFormatters {
             else -> apiSpeed
         }
     }
+
+    fun formatDateTimePicker(timestamp: Long): String {
+        val instant = Instant.ofEpochSecond(timestamp)
+        val zoneOffset = ZoneOffset.systemDefault().rules.getOffset(instant)
+        val formatter = DateTimeFormatter.ofPattern("MMM d, hh:mm a", Locale.getDefault())
+        val formatted = instant.atZone(zoneOffset).format(formatter)
+        return localizeDigits(formatted)
+    }
 }
 
 

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface Repository {
     // Remote
-    fun getFiveDayForecast(
+    fun getWeatherForecast(
         lat: Double, lon: Double, units: String, lang: String
     ): Flow<ApiState<ForecastResponse>>
 
@@ -19,7 +19,8 @@ interface Repository {
 
     // Local - Alerts
     fun getAllWeatherAlerts(): Flow<List<WeatherAlert>>
-    suspend fun insertWeatherAlert(alert: WeatherAlert)
+    suspend fun insertWeatherAlert(alert: WeatherAlert): Long
     suspend fun deleteWeatherAlert(alert: WeatherAlert)
+    suspend fun getAlertById(id: Int): WeatherAlert?
     suspend fun updateWeatherAlert(alert: WeatherAlert)
 }

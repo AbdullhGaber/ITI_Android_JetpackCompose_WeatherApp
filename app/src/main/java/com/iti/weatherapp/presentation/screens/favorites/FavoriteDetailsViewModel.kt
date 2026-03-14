@@ -55,7 +55,7 @@ class FavoriteDetailsViewModel @Inject constructor(
             val units = _tempUnit.value
             val language = settingsPreferences.languageFlow.first()
             try {
-                repository.getFiveDayForecast(
+                repository.getWeatherForecast(
                     lat = args.lat,
                     lon = args.lon,
                     units = units,

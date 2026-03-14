@@ -10,7 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.iti.weatherapp.presentation.EmptyScreen
+import com.iti.weatherapp.presentation.screens.alerts.AlertsScreen
 import com.iti.weatherapp.presentation.screens.favorites.FavoriteDetailsScreen
 import com.iti.weatherapp.presentation.screens.favorites.FavoritesScreen
 import com.iti.weatherapp.presentation.screens.favorites.FavoritesViewModel
@@ -48,7 +48,11 @@ fun WeatherNavHost(
                 }
             )
         }
-        composable<Alerts> { EmptyScreen("Alerts Screen") }
+
+        composable<Alerts> {
+            AlertsScreen()
+        }
+
         composable<Settings> {
             SettingsScreen(
                 viewModel = settingsViewModel,

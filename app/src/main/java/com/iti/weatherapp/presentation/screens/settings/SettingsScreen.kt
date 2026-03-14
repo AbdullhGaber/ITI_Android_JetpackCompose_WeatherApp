@@ -25,6 +25,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.iti.weatherapp.R
 import com.iti.weatherapp.presentation.ui.theme.AppTheme
 import androidx.compose.foundation.lazy.rememberLazyListState
+import com.iti.weatherapp.presentation.LocalBottomPadding
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -37,7 +38,7 @@ fun SettingsScreen(
     val windUnit by viewModel.windUnitState.collectAsState()
     val appTheme by viewModel.themeState.collectAsState()
     val language by viewModel.languageState.collectAsState()
-
+    val dynamicBottomPadding = LocalBottomPadding.current
     val listState = rememberLazyListState()
 
     AnimatedContent(
@@ -59,7 +60,7 @@ fun SettingsScreen(
                     .fillMaxSize()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 100.dp)
+                contentPadding = PaddingValues(bottom = dynamicBottomPadding + 16.dp)
             ) {
                 item {
                     Text(

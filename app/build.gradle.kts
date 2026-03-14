@@ -74,6 +74,12 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
 
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Hilt Worker Extension
+    implementation(libs.androidx.hilt.work)
+
     implementation(libs.play.services.location)
     // Google Maps Compose
     implementation(libs.maps.compose)

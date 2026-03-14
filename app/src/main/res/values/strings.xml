@@ -38,4 +38,14 @@
     <string name="wind_ms">m/s</string>
     <string name="wind_mph">mph</string>
     <string name="pressure_unit">hpa</string>
+    <string name="alerts_title">Alerts</string>
+    <string name="add_alert">Add Alert</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="notification">Notification</string>
+    <string name="alarm">Alarm</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_alerts">No alerts scheduled yet.\nTap + to add one.</string>
+    <string name="cancel_alarm">Cancel Alarm</string>
 </resources>

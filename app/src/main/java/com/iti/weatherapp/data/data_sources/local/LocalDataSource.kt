@@ -10,7 +10,8 @@ interface LocalDataSource {
     suspend fun deleteFavoriteLocation(location: FavoriteLocation)
 
     fun getAllWeatherAlerts(): Flow<List<WeatherAlert>>
-    suspend fun insertWeatherAlert(alert: WeatherAlert)
+    suspend fun insertWeatherAlert(alert: WeatherAlert): Long
     suspend fun deleteWeatherAlert(alert: WeatherAlert)
+    suspend fun getAlertById(id: Int): WeatherAlert?
     suspend fun updateWeatherAlert(alert: WeatherAlert)
 }

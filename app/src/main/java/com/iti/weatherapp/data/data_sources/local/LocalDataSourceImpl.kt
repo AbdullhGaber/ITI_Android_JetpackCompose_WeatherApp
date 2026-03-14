@@ -16,7 +16,8 @@ class LocalDataSourceImpl @Inject constructor(
     override suspend fun deleteFavoriteLocation(location: FavoriteLocation) = favoriteLocationsDao.deleteFavoriteLocation(location)
 
     override fun getAllWeatherAlerts() = weatherAlertsDao.getAllWeatherAlerts()
-    override suspend fun insertWeatherAlert(alert: WeatherAlert) = weatherAlertsDao.insertWeatherAlert(alert)
+    override suspend fun insertWeatherAlert(alert: WeatherAlert) : Long = weatherAlertsDao.insertWeatherAlert(alert)
     override suspend fun deleteWeatherAlert(alert: WeatherAlert) = weatherAlertsDao.deleteWeatherAlert(alert)
+    override suspend fun getAlertById(id: Int): WeatherAlert? = weatherAlertsDao.getAlertById(id)
     override suspend fun updateWeatherAlert(alert: WeatherAlert) = weatherAlertsDao.updateWeatherAlert(alert)
 }
