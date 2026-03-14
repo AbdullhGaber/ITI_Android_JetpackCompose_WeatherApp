@@ -15,21 +15,22 @@ import com.iti.weatherapp.presentation.screens.favorites.FavoriteDetailsScreen
 import com.iti.weatherapp.presentation.screens.favorites.FavoritesScreen
 import com.iti.weatherapp.presentation.screens.favorites.FavoritesViewModel
 import com.iti.weatherapp.presentation.screens.home.HomeScreen
-import com.iti.weatherapp.presentation.screens.map.MapPickScreen
+import com.iti.weatherapp.presentation.screens.map.LocationPickerScreen
+import com.iti.weatherapp.presentation.screens.map.MapConfig
 import com.iti.weatherapp.presentation.screens.settings.SettingsScreen
 import com.iti.weatherapp.presentation.screens.settings.SettingsViewModel
 import com.iti.weatherapp.presentation.utils.LocationUtils
 
 @Composable
 fun WeatherNavHost(
-    navController : NavHostController,
+    navController: NavHostController,
     startDestination: Any,
-    modifier: Modifier
-){
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val favoritesViewModel: FavoritesViewModel = hiltViewModel()
-    val customLocation by settingsViewModel.customLocationState.collectAsState()
+    val customLocation by settingsViewModel.customMapLocationState.collectAsState()
 
     NavHost(
         navController = navController,
@@ -37,6 +38,7 @@ fun WeatherNavHost(
         modifier = modifier
     ) {
         composable<Home> { HomeScreen() }
+
         composable<Favorites> {
             FavoritesScreen(
                 viewModel = favoritesViewModel,
@@ -57,7 +59,7 @@ fun WeatherNavHost(
             SettingsScreen(
                 viewModel = settingsViewModel,
                 onNavigateToMap = {
-                    navController.navigate(MapPick)
+                    navController.navigate(MapPick())
                 }
             )
         }
@@ -65,18 +67,38 @@ fun WeatherNavHost(
         composable<MapPick> { backStackEntry ->
             val args = backStackEntry.toRoute<MapPick>()
 
-            MapPickScreen(
-                initialLat = customLocation.first,
-                initialLng = customLocation.second,
-                onBack = { navController.navigateUp() },
-                onPlacePicked = { lat, long ->
+            LocationPickerScreen(
+                mapConfig = MapConfig(
+                    initialLat = customLocation.first,
+                    initialLon = customLocation.second
+                ),
+                onLocationSelected = { pickedLocation ->
                     if (args.isForFavorites) {
-                        LocationUtils.getCityNameFromCoordinates(context, lat, long){ cityName ->
-                            favoritesViewModel.addFavorite(cityName, lat, long)
+                        if (pickedLocation.cityName.isNullOrBlank()) {
+                            LocationUtils.getCityNameFromCoordinates(
+                                context,
+                                pickedLocation.lat,
+                                pickedLocation.lon
+                            ) { resolvedName ->
+                                favoritesViewModel.addFavorite(
+                                    resolvedName,
+                                    pickedLocation.lat,
+                                    pickedLocation.lon
+                                )
+                            }
+                        } else {
+                            favoritesViewModel.addFavorite(
+                                pickedLocation.cityName,
+                                pickedLocation.lat,
+                                pickedLocation.lon
+                            )
                         }
                     } else {
-                        settingsViewModel.saveCustomLocation(lat, long)
+                        settingsViewModel.saveCustomMapLocation(pickedLocation.lat, pickedLocation.lon)
                     }
+                    navController.navigateUp()
+                },
+                onDismiss = {
                     navController.navigateUp()
                 }
             )

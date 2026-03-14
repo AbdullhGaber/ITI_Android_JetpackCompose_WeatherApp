@@ -35,7 +35,7 @@ class WeatherAlertWorker @AssistedInject constructor(
                 return Result.success()
             }
 
-             val currentCoordinates = settingsPreferences.customLocationFlow.first()
+             val currentCoordinates = settingsPreferences.currentLocationFlow.first()
              val unit = settingsPreferences.tempUnitFlow.first()
              val language = settingsPreferences.languageFlow.first()
              val weatherData = repository.getWeatherForecast(

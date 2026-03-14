@@ -35,7 +35,7 @@ class WeatherAlarmReceiver : BroadcastReceiver() {
             try {
                 val alert = repository.getAlertById(alertId) ?: return@launch
 
-                val currentCoordinates = settingsPreferences.customLocationFlow.first()
+                val currentCoordinates = settingsPreferences.currentLocationFlow.first()
                 val unit = settingsPreferences.tempUnitFlow.first()
                 val language = settingsPreferences.languageFlow.first()
 

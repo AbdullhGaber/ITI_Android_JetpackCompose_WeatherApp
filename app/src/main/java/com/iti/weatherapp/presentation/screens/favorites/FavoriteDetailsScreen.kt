@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.iti.weatherapp.R
+import com.iti.weatherapp.presentation.LocalBottomPadding
 import com.iti.weatherapp.presentation.screens.home.HomeContent
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
 
@@ -35,6 +37,7 @@ fun FavoriteDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                expandedHeight = 0.dp,
                 title = { Text(viewModel.cityName) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -51,8 +54,8 @@ fun FavoriteDetailsScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
         ) {
             if (isLoading && weatherData == null) {
@@ -69,15 +72,17 @@ fun FavoriteDetailsScreen(
                     }
                 }
             } else if (weatherData != null) {
-                HomeContent(
-                    forecast = weatherData,
-                    tempUnitPref = tempUnitPref,
-                    windUnitPref = windUnitPref,
-                    tempUnitSuffix = tempUnitSuffix,
-                    windUnitSuffix = windUnitSuffix,
-                    onRefresh = { viewModel.fetchFavoriteWeather() },
-                    isRefreshing = isLoading
-                )
+                CompositionLocalProvider(LocalBottomPadding provides 0.dp) {
+                    HomeContent(
+                        forecast = weatherData,
+                        tempUnitPref = tempUnitPref,
+                        windUnitPref = windUnitPref,
+                        tempUnitSuffix = tempUnitSuffix,
+                        windUnitSuffix = windUnitSuffix,
+                        onRefresh = { viewModel.fetchFavoriteWeather() },
+                        isRefreshing = isLoading
+                    )
+                }
             }
         }
     }

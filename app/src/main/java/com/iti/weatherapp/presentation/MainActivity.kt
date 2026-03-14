@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +38,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.iti.weatherapp.presentation.navigations.Alerts
+import com.iti.weatherapp.presentation.navigations.FavoriteDetails
 import com.iti.weatherapp.presentation.navigations.Home
 import com.iti.weatherapp.presentation.navigations.TelegramBottomNavItem
 import com.iti.weatherapp.presentation.navigations.WeatherNavHost
@@ -90,35 +91,40 @@ class MainActivity : AppCompatActivity() {
             }
 
             WeatherAppTheme(appTheme = appTheme){
+                val isFavoriteDetails = currentDestination?.hierarchy?.any {
+                    it.hasRoute(FavoriteDetails::class)
+                } == true
                 Scaffold(
                     bottomBar = {
-                        NavigationBar(
-                            windowInsets = WindowInsets(bottom = 16.dp),
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .clip(RoundedCornerShape(24.dp))
-                                .border(border = BorderStroke(width = 0.4.dp, color = Color.Black.copy(0.15f),), shape = RoundedCornerShape(24.dp)),
-                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                            tonalElevation = 16.dp,
-                        ){
-                            getBottomNavItems().forEach { item ->
-                                val isSelected = currentDestination?.hierarchy?.any {
-                                    it.hasRoute(item.route::class)
-                                } == true
+                        if(!isFavoriteDetails){
+                            NavigationBar(
+                                modifier = Modifier
+                                    .navigationBarsPadding()
+                                    .padding(horizontal = 16.dp)
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .border(border = BorderStroke(width = 0.4.dp, color = Color.Black.copy(0.15f),), shape = RoundedCornerShape(24.dp)),
+                                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                tonalElevation = 16.dp,
+                            ){
+                                getBottomNavItems().forEach { item ->
+                                    val isSelected = currentDestination?.hierarchy?.any {
+                                        it.hasRoute(item.route::class)
+                                    } == true
 
-                                TelegramBottomNavItem(
-                                    title = item.title,
-                                    icon = item.icon,
-                                    isSelected = isSelected,
-                                    onClick = {
-                                        navController.navigate(item.route) {
-                                            popUpTo(Home) { saveState = true }
-                                            launchSingleTop = true
-                                            restoreState = true
+                                    TelegramBottomNavItem(
+                                        title = item.title,
+                                        icon = item.icon,
+                                        isSelected = isSelected,
+                                        onClick = {
+                                            navController.navigate(item.route) {
+                                                popUpTo(Home) { saveState = true }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
                                         }
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                     }
@@ -135,15 +141,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun EmptyScreen(title: String) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = title)
     }
 }

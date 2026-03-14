@@ -86,6 +86,10 @@ dependencies {
     // Google Play Services for Maps
     implementation(libs.play.services.maps)
 
+    implementation(libs.maplibre.compose.m3)
+    implementation(libs.maplibre.compose)
+    implementation(libs.spatialk.geojson)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

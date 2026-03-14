@@ -33,7 +33,7 @@ class HomeViewModel @Inject constructor(
     val locationMethod = settingsPreferences.locationMethodFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "gps")
 
-    val customLocation = settingsPreferences.customLocationFlow
+    val customMapLocationFlow = settingsPreferences.customMapLocationFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Pair(31.2001, 29.9187))
 
     private val _tempUnit = mutableStateOf("metric")
@@ -66,7 +66,7 @@ class HomeViewModel @Inject constructor(
                         _isLoading.value = false
                         _error.value = null
                         _weatherData.value = state.data
-                        settingsPreferences.saveCustomLocation(lat,lon)
+                        settingsPreferences.saveCurrentLocation(lat,lon)
                     }
                 }
             }

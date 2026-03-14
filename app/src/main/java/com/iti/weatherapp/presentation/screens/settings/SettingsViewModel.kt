@@ -32,12 +32,11 @@ class SettingsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "System Language")
 
 
-    val customLocationState: StateFlow<Pair<Double, Double>> = settingsPreferences.customLocationFlow
+    val customMapLocationState: StateFlow<Pair<Double, Double>> = settingsPreferences.customMapLocationFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Pair(31.2001, 29.9187))
 
-
-    fun saveCustomLocation(lat: Double, lng: Double) = viewModelScope.launch {
-        settingsPreferences.saveCustomLocation(lat, lng)
+    fun saveCustomMapLocation(lat: Double, lng: Double) = viewModelScope.launch {
+        settingsPreferences.saveCustomMapLocation(lat, lng)
     }
     fun setLocationMethod(method: String) = viewModelScope.launch { settingsPreferences.saveLocationMethod(method) }
     fun setTempUnit(unit: String) = viewModelScope.launch { settingsPreferences.saveTempUnit(unit) }

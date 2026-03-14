@@ -89,7 +89,10 @@ fun SettingsScreen(
                             Text(text = stringResource(R.string.use_gps), fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
                             Switch(
                                 checked = locationMethod == "gps",
-                                onCheckedChange = { viewModel.setLocationMethod(if (it) "gps" else "map") },
+                                onCheckedChange = { isGps ->
+                                    viewModel.setLocationMethod(if (isGps) "gps" else "map")
+                                    if(!isGps) onNavigateToMap()
+                                },
                                 colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = MaterialTheme.colorScheme.primary)
                             )
                         }
@@ -107,19 +110,21 @@ fun SettingsScreen(
                             label = "pulseScale"
                         )
 
-                        OutlinedButton(
-                            onClick = { onNavigateToMap() },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .graphicsLayer(scaleX = pulseScale, scaleY = pulseScale)
-                                .padding(top = 8.dp),
-                            shape = RoundedCornerShape(20.dp),
-                            border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(imageVector = Icons.Default.Place, contentDescription = null, modifier = Modifier.size(20.dp))
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text(text = stringResource(R.string.select_map), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary)
+                        if(locationMethod == "map"){
+                            OutlinedButton(
+                                onClick = { onNavigateToMap() },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .graphicsLayer(scaleX = pulseScale, scaleY = pulseScale)
+                                    .padding(top = 8.dp),
+                                shape = RoundedCornerShape(20.dp),
+                                border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(imageVector = Icons.Default.Place, contentDescription = null, modifier = Modifier.size(20.dp))
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(text = stringResource(R.string.select_map), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary)
+                                }
                             }
                         }
                     }

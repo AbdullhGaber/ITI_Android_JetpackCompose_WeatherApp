@@ -31,6 +31,9 @@ class SettingsPreferences @Inject constructor(
 
         val CUSTOM_LAT = doublePreferencesKey("custom_lat")
         val CUSTOM_LNG = doublePreferencesKey("custom_lng")
+
+        val CURRENT_LAT = doublePreferencesKey("current_lat")
+        val CURRENT_LNG = doublePreferencesKey("current_lng")
     }
     val locationMethodFlow: Flow<String> = context.dataStore.data.map { prefs -> prefs[LOCATION_METHOD] ?: "gps" }
     val tempUnitFlow: Flow<String> = context.dataStore.data.map { prefs -> prefs[UNIT_TEMP] ?: "metric" }
@@ -42,9 +45,15 @@ class SettingsPreferences @Inject constructor(
         AppTheme.valueOf(storedValue)
     }
 
-    val customLocationFlow: Flow<Pair<Double, Double>> = context.dataStore.data.map { prefs ->
+    val customMapLocationFlow: Flow<Pair<Double, Double>> = context.dataStore.data.map { prefs ->
         val lat = prefs[CUSTOM_LAT] ?: 31.2001
         val lng = prefs[CUSTOM_LNG] ?: 29.9187
+        Pair(lat, lng)
+    }
+
+    val currentLocationFlow: Flow<Pair<Double, Double>> = context.dataStore.data.map { prefs ->
+        val lat = prefs[CURRENT_LAT] ?: 31.2001
+        val lng = prefs[CURRENT_LNG] ?: 29.9187
         Pair(lat, lng)
     }
 
@@ -62,11 +71,17 @@ class SettingsPreferences @Inject constructor(
     suspend fun saveLanguage(lang: String) = context.dataStore.edit { it[APP_LANGUAGE] = lang }
     suspend fun saveTheme(theme: AppTheme) = context.dataStore.edit { it[APP_THEME] = theme.name }
 
-    suspend fun saveCustomLocation(lat : Double, lng : Double){
+    suspend fun saveCustomMapLocation(lat : Double, lng : Double){
         context.dataStore.edit { prefs ->
             prefs[CUSTOM_LAT] = lat
             prefs[CUSTOM_LNG] = lng
-            prefs[LOCATION_METHOD] = "map"
+        }
+    }
+
+    suspend fun saveCurrentLocation(lat : Double, lng : Double){
+        context.dataStore.edit { prefs ->
+            prefs[CURRENT_LAT] = lat
+            prefs[CURRENT_LNG] = lng
         }
     }
 }

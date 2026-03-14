@@ -32,6 +32,7 @@ import com.iti.weatherapp.data.models.ForecastItem
 import com.iti.weatherapp.data.models.ForecastResponse
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
 import androidx.compose.runtime.*
+import com.iti.weatherapp.presentation.LocalBottomPadding
 import com.iti.weatherapp.presentation.screens.home.components.DailyForecastSection
 import com.iti.weatherapp.presentation.screens.home.components.HorizontalWeatherMetricItem
 import com.iti.weatherapp.presentation.screens.home.components.HourlyForecastSection
@@ -48,7 +49,7 @@ fun HomeScreen(
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
     val locationMethod by viewModel.locationMethod.collectAsState()
-    val customLocation by viewModel.customLocation.collectAsState()
+    val customLocation by viewModel.customMapLocationFlow.collectAsState()
 
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
@@ -97,7 +98,7 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(locationMethod, customLocation) {
+    LaunchedEffect(locationMethod,customLocation) {
         triggerWeatherUpdate()
     }
 
@@ -150,6 +151,9 @@ fun HomeContent(
     val dailyForecast = WeatherFormatters.groupForecastByDay(forecast)
     val exactCurrentTimeSeconds = System.currentTimeMillis() / 1000
 
+    // 1. Grab the dynamic padding
+    val dynamicBottomPadding = LocalBottomPadding.current
+
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
@@ -157,14 +161,20 @@ fun HomeContent(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
+            // 2. Add the dynamic padding to the bottom of the list gracefully
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp + dynamicBottomPadding
+            ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item { HeaderSection(forecast.city.name, exactCurrentTimeSeconds, timezoneOffset) }
             item { MainWeatherCard(currentForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset) }
             item { HourlyForecastSection(forecast.forecastList.take(8), tempUnitSuffix, timezoneOffset) }
             item { DailyForecastSection(dailyForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset) }
-            item { Spacer(modifier = Modifier.height(100.dp)) }
+            // 3. Removed the hardcoded 100.dp spacer!
         }
     }
 }
