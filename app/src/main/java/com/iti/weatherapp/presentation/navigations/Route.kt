@@ -10,9 +10,10 @@ object Favorites
 object Alerts
 @Serializable
 object Settings
-
 @Serializable
 data class MapPick(val isForFavorites: Boolean = false)
+@Serializable
+data class FavoriteDetails(val lat: Double, val lon: Double, val cityName: String)
 
 @Serializable
-data class FavoriteDetails(val lat: Double, val lon: Double, val cityName: String) // New Route
+object Onboarding

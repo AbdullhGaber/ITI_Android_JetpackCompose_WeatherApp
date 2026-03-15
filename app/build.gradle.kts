@@ -23,6 +23,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/LICENSE-notice.md"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -66,6 +74,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.junit.ktx)
     ksp(libs.hilt.compiler)
 
     implementation(libs.androidx.room.runtime)
@@ -79,18 +88,28 @@ dependencies {
 
     // Hilt Worker Extension
     implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     implementation(libs.play.services.location)
-    // Google Maps Compose
-    implementation(libs.maps.compose)
-    // Google Play Services for Maps
-    implementation(libs.play.services.maps)
 
     implementation(libs.maplibre.compose.m3)
     implementation(libs.maplibre.compose)
     implementation(libs.spatialk.geojson)
 
+    implementation(libs.lottie.compose)
+
     testImplementation(libs.junit)
+    // Local Unit Tests (Run on JVM)
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
+
+    // Instrumented Tests (Run on Android Device/Emulator)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.androidx.core.testing)
+    androidTestImplementation(libs.androidx.room.testing)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

@@ -45,13 +45,15 @@ object NotificationHelper {
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    fun showAlarmNotification(context: Context, alertId: Int, title: String, message: String) {
+    fun showAlarmNotification(context: Context, alertId: Int, title: String, message: String, isUpdate: Boolean = false) {
         val notificationManager = context.getSystemService(NotificationManager::class.java)
 
         val cancelIntent = Intent(context, AlarmCancelActionReceiver::class.java).apply {
             putExtra(EXTRA_ALERT_ID, alertId)
         }
-        val cancelPendingIntent = PendingIntent.getBroadcast(context, alertId, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val cancelPendingIntent = PendingIntent.getBroadcast(
+            context, alertId, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val notification = NotificationCompat.Builder(context, ALARM_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -59,21 +61,19 @@ object NotificationHelper {
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOngoing(true)
             .setAutoCancel(false)
-            .setContentIntent(getMainActivityPendingIntent(context))
             .setFullScreenIntent(getMainActivityPendingIntent(context), true)
-            .setDeleteIntent(cancelPendingIntent)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(R.string.cancel_alarm), cancelPendingIntent)
+            .setDeleteIntent(cancelPendingIntent)
+            .setOnlyAlertOnce(isUpdate)
             .build()
 
         notificationManager.notify(alertId, notification)
     }
 
-    fun showStandardNotification(context: Context, alertId: Int, title: String, message: String) {
+    fun showStandardNotification(context: Context, alertId: Int, title: String, message: String, isUpdate: Boolean = false) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(title)
@@ -81,6 +81,7 @@ object NotificationHelper {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
             .setContentIntent(getMainActivityPendingIntent(context))
+            .setOnlyAlertOnce(isUpdate)
             .build()
 
         notificationManager.notify(alertId, notification)

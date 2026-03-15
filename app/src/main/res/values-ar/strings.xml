@@ -47,6 +47,7 @@
     <string name="alarm">منبه</string>
     <string name="save">حفظ</string>
     <string name="cancel">إلغاء</string>
-    <string name="no_alerts">لا توجد تنبيهات مجدولة حتى الآن.\nاضغط على + لإضافة واحد.</string>
+    <string name="no_alerts">لا توجد تنبيهات مجدولة حتى الآن.\nاضغط على رمز الجرس لإضافة واحد.</string>
+    <string name="no_favorites">لا توجد اماكن مفضلة حتى الآن.\nاضغط على رمز المفضلة لإضافة مكان.</string>
     <string name="cancel_alarm">الغاء المنبه</string>
 </resources>

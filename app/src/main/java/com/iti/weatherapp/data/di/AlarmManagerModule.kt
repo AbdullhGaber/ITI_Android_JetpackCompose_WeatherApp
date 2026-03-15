@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AlarmSchedulerModule {
+object AlarmManagerModule {
     @Provides
     @Singleton
     fun provideWeatherAlarmScheduler(@ApplicationContext context: Context): WeatherAlarmScheduler {

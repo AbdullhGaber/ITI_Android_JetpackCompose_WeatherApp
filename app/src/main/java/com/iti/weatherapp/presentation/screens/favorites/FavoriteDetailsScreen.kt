@@ -16,6 +16,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.iti.weatherapp.R
 import com.iti.weatherapp.presentation.LocalBottomPadding
 import com.iti.weatherapp.presentation.screens.home.HomeContent
+import com.iti.weatherapp.presentation.screens.home.components.HomeShimmerLoading
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +60,7 @@ fun FavoriteDetailsScreen(
             contentAlignment = Alignment.Center
         ) {
             if (isLoading && weatherData == null) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                HomeShimmerLoading()
             } else if (error != null) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(

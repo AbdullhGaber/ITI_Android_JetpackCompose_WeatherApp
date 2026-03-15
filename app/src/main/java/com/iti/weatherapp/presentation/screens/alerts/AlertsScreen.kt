@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +37,7 @@ import com.iti.weatherapp.presentation.screens.alerts.components.AddAlertBottomS
 import com.iti.weatherapp.presentation.screens.alerts.components.AlertItemCard
 import java.util.Calendar
 import androidx.core.net.toUri
+import com.iti.weatherapp.presentation.components.EmptyStateView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,6 +98,7 @@ fun AlertsScreen(
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     Scaffold(
+        contentWindowInsets = WindowInsets(bottom = 0.dp),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddAlertClicked,
@@ -123,11 +126,13 @@ fun AlertsScreen(
             )
 
             if (alerts.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = stringResource(R.string.no_alerts),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ){
+                    EmptyStateView(
+                        animationResId = R.raw.no_alerts,
+                        message = stringResource(R.string.no_alerts),
+                        modifier = Modifier.align(Center)
                     )
                 }
             } else {

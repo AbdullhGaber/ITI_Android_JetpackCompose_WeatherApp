@@ -46,6 +46,7 @@
     <string name="alarm">Alarm</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
-    <string name="no_alerts">No alerts scheduled yet.\nTap + to add one.</string>
+    <string name="no_alerts">No alerts scheduled yet.\nTap alert icon to add one.</string>
+    <string name="no_favorites">No favorites yet.\nTap favorite icon to add a location.</string>
     <string name="cancel_alarm">Cancel Alarm</string>
 </resources>

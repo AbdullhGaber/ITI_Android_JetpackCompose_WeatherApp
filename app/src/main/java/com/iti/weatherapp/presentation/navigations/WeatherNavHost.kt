@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.iti.weatherapp.presentation.MainViewModel
 import com.iti.weatherapp.presentation.screens.alerts.AlertsScreen
 import com.iti.weatherapp.presentation.screens.favorites.FavoriteDetailsScreen
 import com.iti.weatherapp.presentation.screens.favorites.FavoritesScreen
@@ -17,15 +18,17 @@ import com.iti.weatherapp.presentation.screens.favorites.FavoritesViewModel
 import com.iti.weatherapp.presentation.screens.home.HomeScreen
 import com.iti.weatherapp.presentation.screens.map.LocationPickerScreen
 import com.iti.weatherapp.presentation.screens.map.MapConfig
+import com.iti.weatherapp.presentation.screens.onboarding.OnboardingScreen
 import com.iti.weatherapp.presentation.screens.settings.SettingsScreen
 import com.iti.weatherapp.presentation.screens.settings.SettingsViewModel
 import com.iti.weatherapp.presentation.utils.LocationUtils
 
 @Composable
 fun WeatherNavHost(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: Any,
-    modifier: Modifier = Modifier
+    mainViewModel: MainViewModel
 ) {
     val context = LocalContext.current
     val settingsViewModel: SettingsViewModel = hiltViewModel()
@@ -106,6 +109,20 @@ fun WeatherNavHost(
 
         composable<FavoriteDetails> {
             FavoriteDetailsScreen(onBack = { navController.navigateUp() })
+        }
+
+        composable<Onboarding> {
+            OnboardingScreen(
+                onFinish = {
+                    // 1. Save to DataStore so they never see it again
+                    mainViewModel.completeOnboarding()
+
+                    // 2. Navigate to Home and destroy the Onboarding screen so the user can't hit the back button to return to it
+                    navController.navigate(Home) {
+                        popUpTo(Onboarding) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

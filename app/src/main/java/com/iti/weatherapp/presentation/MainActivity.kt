@@ -40,9 +40,11 @@ import androidx.navigation.compose.rememberNavController
 import com.iti.weatherapp.presentation.navigations.Alerts
 import com.iti.weatherapp.presentation.navigations.FavoriteDetails
 import com.iti.weatherapp.presentation.navigations.Home
+import com.iti.weatherapp.presentation.navigations.Onboarding
 import com.iti.weatherapp.presentation.navigations.TelegramBottomNavItem
 import com.iti.weatherapp.presentation.navigations.WeatherNavHost
 import com.iti.weatherapp.presentation.navigations.components.getBottomNavItems
+import com.iti.weatherapp.presentation.screens.onboarding.OnboardingScreen
 import com.iti.weatherapp.presentation.ui.theme.AppTheme
 import com.iti.weatherapp.presentation.ui.theme.WeatherAppTheme
 import com.iti.weatherapp.presentation.utils.Constants.NAVIGATE_TO_ALERTS
@@ -62,9 +64,13 @@ class MainActivity : AppCompatActivity() {
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
-
+            val startDestination by viewModel.startDestination.collectAsState()
             var shouldNavigateToAlerts by remember {
                 mutableStateOf(intent?.getBooleanExtra(NAVIGATE_TO_ALERTS, false) == true)
+            }
+
+            if (startDestination == null) {
+                return@setContent
             }
 
             DisposableEffect(Unit) {
@@ -92,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
             WeatherAppTheme(appTheme = appTheme){
                 val isFavoriteDetails = currentDestination?.hierarchy?.any {
-                    it.hasRoute(FavoriteDetails::class)
+                    it.hasRoute(FavoriteDetails::class) || it.hasRoute(Onboarding::class)
                 } == true
                 Scaffold(
                     bottomBar = {
@@ -133,9 +139,12 @@ class MainActivity : AppCompatActivity() {
                         LocalBottomPadding provides innerPadding.calculateBottomPadding()
                     ) {
                         WeatherNavHost(
+                            modifier = Modifier.padding(
+                                top = innerPadding.calculateTopPadding(),
+                            ),
                             navController = navController,
-                            startDestination = Home,
-                            modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
+                            startDestination = startDestination!!,
+                            mainViewModel = hiltViewModel()
                         )
                     }
                 }

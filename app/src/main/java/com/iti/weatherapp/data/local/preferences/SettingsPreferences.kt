@@ -2,15 +2,19 @@ package com.iti.weatherapp.data.local.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.iti.weatherapp.data.utils.Constants.DATASTORE_NAME
 import com.iti.weatherapp.presentation.ui.theme.AppTheme
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,15 +35,27 @@ class SettingsPreferences @Inject constructor(
 
         val CUSTOM_LAT = doublePreferencesKey("custom_lat")
         val CUSTOM_LNG = doublePreferencesKey("custom_lng")
-
         val CURRENT_LAT = doublePreferencesKey("current_lat")
         val CURRENT_LNG = doublePreferencesKey("current_lng")
+
+        val HAS_SEEN_ONBOARDING = booleanPreferencesKey("has_seen_onboarding")
     }
     val locationMethodFlow: Flow<String> = context.dataStore.data.map { prefs -> prefs[LOCATION_METHOD] ?: "gps" }
     val tempUnitFlow: Flow<String> = context.dataStore.data.map { prefs -> prefs[UNIT_TEMP] ?: "metric" }
     val windUnitFlow: Flow<String> = context.dataStore.data.map { prefs -> prefs[UNIT_WIND_SPEED] ?: "meter_sec" }
     val languageFlow: Flow<String> = context.dataStore.data.map { it[APP_LANGUAGE] ?: "System Language" }
 
+    val hasSeenOnboardingFlow: Flow<Boolean> = context.dataStore.data
+        .catch { emit(emptyPreferences()) }
+        .map { preferences ->
+            preferences[HAS_SEEN_ONBOARDING] ?: false
+        }
+
+    suspend fun saveOnboardingState(completed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[HAS_SEEN_ONBOARDING] = completed
+        }
+    }
     val themeFlow: Flow<AppTheme> = context.dataStore.data.map {
         val storedValue = it[APP_THEME] ?: AppTheme.SYSTEM_DEFAULT.name
         AppTheme.valueOf(storedValue)

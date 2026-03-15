@@ -34,6 +34,7 @@ import com.iti.weatherapp.presentation.utils.WeatherFormatters
 import androidx.compose.runtime.*
 import com.iti.weatherapp.presentation.LocalBottomPadding
 import com.iti.weatherapp.presentation.screens.home.components.DailyForecastSection
+import com.iti.weatherapp.presentation.screens.home.components.HomeShimmerLoading
 import com.iti.weatherapp.presentation.screens.home.components.HorizontalWeatherMetricItem
 import com.iti.weatherapp.presentation.screens.home.components.HourlyForecastSection
 import com.iti.weatherapp.presentation.screens.home.components.VerticalWeatherMetricItem
@@ -109,7 +110,7 @@ fun HomeScreen(
         contentAlignment = Alignment.Center
     ) {
         if (isLoading && weatherData == null) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            HomeShimmerLoading()
         } else if (error != null) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
@@ -151,7 +152,6 @@ fun HomeContent(
     val dailyForecast = WeatherFormatters.groupForecastByDay(forecast)
     val exactCurrentTimeSeconds = System.currentTimeMillis() / 1000
 
-    // 1. Grab the dynamic padding
     val dynamicBottomPadding = LocalBottomPadding.current
 
     PullToRefreshBox(
@@ -161,7 +161,6 @@ fun HomeContent(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            // 2. Add the dynamic padding to the bottom of the list gracefully
             contentPadding = PaddingValues(
                 start = 16.dp,
                 top = 16.dp,
@@ -174,7 +173,6 @@ fun HomeContent(
             item { MainWeatherCard(currentForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset) }
             item { HourlyForecastSection(forecast.forecastList.take(8), tempUnitSuffix, timezoneOffset) }
             item { DailyForecastSection(dailyForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset) }
-            // 3. Removed the hardcoded 100.dp spacer!
         }
     }
 }
