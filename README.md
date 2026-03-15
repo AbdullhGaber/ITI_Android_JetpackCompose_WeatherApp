@@ -1,6 +1,6 @@
 # 🌦️ WeatherApp
 
-![Kotlin](https://img.shields.io/badge/Kotlin-1.9+-blue?logo=kotlin)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.2+-blue?logo=kotlin)
 ![Android](https://img.shields.io/badge/Android-Compose-green?logo=jetpackcompose)
 ![MVVM](https://img.shields.io/badge/Architecture-MVVM-purple)
 ![Hilt](https://img.shields.io/badge/Dagger-Hilt-yellow)
