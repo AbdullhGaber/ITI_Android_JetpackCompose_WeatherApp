@@ -41,49 +41,17 @@ class FavoriteDetailsViewModel @Inject constructor(
     private val _windUnit = mutableStateOf("meter_sec")
     val windUnit: State<String> = _windUnit
 
-
-    init {
-        fetchFavoriteWeather()
-    }
-
-    fun fetchFavoriteWeather() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-            _tempUnit.value = settingsPreferences.tempUnitFlow.first()
-            _windUnit.value = settingsPreferences.windUnitFlow.first()
-            val units = _tempUnit.value
-            val language = settingsPreferences.languageFlow.first()
-            try {
-                repository.getWeatherForecast(
-                    lat = args.lat,
-                    lon = args.lon,
-                    units = units,
-                    lang = language
-                ).collect { state ->
-                    when (state) {
-                        is ApiState.Loading -> {
-                            _isLoading.value = true
-                            _error.value = null
-                            _weatherData.value = null
-                        }
-                        is ApiState.Error -> {
-                            _isLoading.value = false
-                            _error.value = state.message
-                            _weatherData.value = null
-                        }
-                        is ApiState.Success -> {
-                            _isLoading.value = false
-                            _error.value = null
-                            _weatherData.value = state.data
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                _error.value = e.message
-            } finally {
-                _isLoading.value = false
-            }
-        }
+    fun fetchFavoriteWeather(lat : Double, lon : Double) {
+       viewModelScope.launch {
+           _isLoading.value = true
+           try {
+                val favoriteLocation = repository.getLocationByCoordinates(lat, lon)
+               _weatherData.value = favoriteLocation?.cachedWeather ?: ForecastResponse()
+           }catch (e : Exception){
+               _error.value = e.message
+           }finally {
+               _isLoading.value = false
+           }
+       }
     }
 }

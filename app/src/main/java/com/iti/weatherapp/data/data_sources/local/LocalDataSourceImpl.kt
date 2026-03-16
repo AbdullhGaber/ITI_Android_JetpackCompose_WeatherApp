@@ -12,6 +12,13 @@ class LocalDataSourceImpl @Inject constructor(
 ) : LocalDataSource {
 
     override fun getAllFavoriteLocations() = favoriteLocationsDao.getAllFavoriteLocations()
+    override suspend fun getLocationByCoordinates(
+        lat: Double,
+        lon: Double
+    ): FavoriteLocation? {
+        return favoriteLocationsDao.getLocationByCoordinates(lat, lon)
+    }
+
     override suspend fun insertFavoriteLocation(location: FavoriteLocation) = favoriteLocationsDao.insertFavoriteLocation(location)
     override suspend fun deleteFavoriteLocation(location: FavoriteLocation) = favoriteLocationsDao.deleteFavoriteLocation(location)
 

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocalDataSource {
     fun getAllFavoriteLocations(): Flow<List<FavoriteLocation>>
+    suspend fun getLocationByCoordinates(lat: Double, lon: Double): FavoriteLocation?
     suspend fun insertFavoriteLocation(location: FavoriteLocation)
     suspend fun deleteFavoriteLocation(location: FavoriteLocation)
 

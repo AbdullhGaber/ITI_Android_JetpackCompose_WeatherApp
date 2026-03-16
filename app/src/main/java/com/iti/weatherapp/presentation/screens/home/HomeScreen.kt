@@ -148,7 +148,7 @@ fun HomeContent(
     isRefreshing: Boolean
 ) {
     val currentForecast = forecast.forecastList.first()
-    val timezoneOffset = forecast.city.timezone
+    val timezoneOffset = forecast.city?.timezone ?: 0
     val dailyForecast = WeatherFormatters.groupForecastByDay(forecast)
     val exactCurrentTimeSeconds = System.currentTimeMillis() / 1000
 
@@ -169,7 +169,7 @@ fun HomeContent(
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item { HeaderSection(forecast.city.name, exactCurrentTimeSeconds, timezoneOffset) }
+            item { HeaderSection(forecast.city?.name ?: "City", exactCurrentTimeSeconds, timezoneOffset) }
             item { MainWeatherCard(currentForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset) }
             item { HourlyForecastSection(forecast.forecastList.take(8), tempUnitSuffix, timezoneOffset) }
             item { DailyForecastSection(dailyForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset) }

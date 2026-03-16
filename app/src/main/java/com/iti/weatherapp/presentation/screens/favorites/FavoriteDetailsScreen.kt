@@ -7,6 +7,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +24,8 @@ import com.iti.weatherapp.presentation.utils.WeatherFormatters
 @Composable
 fun FavoriteDetailsScreen(
     viewModel: FavoriteDetailsViewModel = hiltViewModel(),
+    lat : Double,
+    lon : Double,
     onBack: () -> Unit
 ) {
     val isLoading = viewModel.isLoading.value
@@ -35,6 +38,9 @@ fun FavoriteDetailsScreen(
     val tempUnitSuffix = WeatherFormatters.getTempSuffix(tempUnitPref)
     val windUnitSuffix = if (windUnitPref == "miles_hour") stringResource(R.string.wind_mph) else stringResource(R.string.wind_ms)
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchFavoriteWeather(lat, lon)
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,7 +74,7 @@ fun FavoriteDetailsScreen(
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(16.dp)
                     )
-                    Button(onClick = { viewModel.fetchFavoriteWeather() }) {
+                    Button(onClick = { viewModel.fetchFavoriteWeather(lat, lon) }) {
                         Text(stringResource(R.string.retry))
                     }
                 }
@@ -80,7 +86,7 @@ fun FavoriteDetailsScreen(
                         windUnitPref = windUnitPref,
                         tempUnitSuffix = tempUnitSuffix,
                         windUnitSuffix = windUnitSuffix,
-                        onRefresh = { viewModel.fetchFavoriteWeather() },
+                        onRefresh = { viewModel.fetchFavoriteWeather(lat, lon) },
                         isRefreshing = isLoading
                     )
                 }

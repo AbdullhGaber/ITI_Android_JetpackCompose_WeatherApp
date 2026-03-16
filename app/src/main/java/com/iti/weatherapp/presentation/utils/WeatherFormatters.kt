@@ -61,7 +61,7 @@ object WeatherFormatters {
     fun groupForecastByDay(response: ForecastResponse): List<DailyForecastItem> {
         val groupedList = response.forecastList.groupBy { item ->
             val instant = Instant.ofEpochSecond(item.timestamp)
-            val zoneOffset = ZoneOffset.ofTotalSeconds(response.city.timezone)
+            val zoneOffset = ZoneOffset.ofTotalSeconds(response.city?.timezone?: 0)
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)
             instant.atZone(zoneOffset).format(formatter)
         }
@@ -69,7 +69,7 @@ object WeatherFormatters {
         return groupedList.map { (_, dayItems) ->
             val noonItem = dayItems.find { item ->
                 val instant = Instant.ofEpochSecond(item.timestamp)
-                val zoneOffset = ZoneOffset.ofTotalSeconds(response.city.timezone)
+                val zoneOffset = ZoneOffset.ofTotalSeconds(response.city?.timezone ?: 0)
                 val formatter = DateTimeFormatter.ofPattern("HH", Locale.US)
                 instant.atZone(zoneOffset).format(formatter) == "12"
             } ?: dayItems.first()

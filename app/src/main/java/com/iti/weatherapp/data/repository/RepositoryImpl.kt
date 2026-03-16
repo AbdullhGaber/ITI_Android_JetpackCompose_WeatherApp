@@ -28,6 +28,13 @@ class RepositoryImpl @Inject constructor(
         emit(result)
     }
 
+    override suspend fun getLocationByCoordinates(
+        lat: Double,
+        lon: Double
+    ): FavoriteLocation? {
+        return localDataSource.getLocationByCoordinates(lat, lon)
+    }
+
     override fun getAllFavoriteLocations() = localDataSource.getAllFavoriteLocations()
     override suspend fun insertFavoriteLocation(location: FavoriteLocation) = localDataSource.insertFavoriteLocation(location)
     override suspend fun deleteFavoriteLocation(location: FavoriteLocation) = localDataSource.deleteFavoriteLocation(location)

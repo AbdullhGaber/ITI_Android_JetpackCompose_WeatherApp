@@ -22,7 +22,6 @@ class WeatherAlarmWorker @AssistedInject constructor(
     private val repository: Repository,
     private val settingsPreferences: SettingsPreferences
 ) : CoroutineWorker(context, workerParams) {
-
     override suspend fun doWork(): Result {
         val alertId = inputData.getInt(EXTRA_ALERT_ID, -1)
         val alertTypeStr = inputData.getString(EXTRA_ALERT_TYPE) ?: return Result.failure()

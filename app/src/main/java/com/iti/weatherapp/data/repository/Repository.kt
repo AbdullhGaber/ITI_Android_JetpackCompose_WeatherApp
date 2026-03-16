@@ -14,6 +14,7 @@ interface Repository {
 
     // Local - Favorites
     fun getAllFavoriteLocations(): Flow<List<FavoriteLocation>>
+    suspend fun getLocationByCoordinates(lat: Double, lon: Double): FavoriteLocation?
     suspend fun insertFavoriteLocation(location: FavoriteLocation)
     suspend fun deleteFavoriteLocation(location: FavoriteLocation)
 

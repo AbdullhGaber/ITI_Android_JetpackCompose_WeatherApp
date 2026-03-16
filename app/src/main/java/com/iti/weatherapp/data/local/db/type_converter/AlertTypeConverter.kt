@@ -4,7 +4,6 @@ import androidx.room.TypeConverter
 import com.iti.weatherapp.data.local.db.entities.AlertType
 
 class AlertTypeConverter {
-    
     @TypeConverter
     fun fromAlertType(alertType: AlertType): String {
         return alertType.name

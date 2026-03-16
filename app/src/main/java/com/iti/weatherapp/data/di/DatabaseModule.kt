@@ -2,9 +2,12 @@ package com.iti.weatherapp.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.google.gson.Gson
 import com.iti.weatherapp.data.local.db.WeatherDatabase
 import com.iti.weatherapp.data.local.db.daos.FavoriteLocationsDao
 import com.iti.weatherapp.data.local.db.daos.WeatherAlertsDao
+import com.iti.weatherapp.data.local.db.type_converter.WeatherForecastConverters
+import com.iti.weatherapp.data.utils.GsonParser
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +18,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
-
     @Provides
     @Singleton
     fun provideWeatherDatabase(
@@ -25,7 +27,9 @@ object DatabaseModule {
             context,
             WeatherDatabase::class.java,
             "weather_database"
-        ).build()
+        ).fallbackToDestructiveMigration(false).addTypeConverter(
+                WeatherForecastConverters(GsonParser(Gson()))
+            ).build()
     }
 
     @Provides

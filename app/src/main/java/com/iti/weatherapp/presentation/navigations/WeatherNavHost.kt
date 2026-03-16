@@ -108,16 +108,22 @@ fun WeatherNavHost(
         }
 
         composable<FavoriteDetails> {
-            FavoriteDetailsScreen(onBack = { navController.navigateUp() })
+            val favoriteDetails = it.toRoute<FavoriteDetails>()
+
+            val lat = favoriteDetails.lat
+            val lon = favoriteDetails.lon
+
+            FavoriteDetailsScreen(
+                lat = lat,
+                lon = lon,
+                onBack = { navController.navigateUp() }
+            )
         }
 
         composable<Onboarding> {
             OnboardingScreen(
                 onFinish = {
-                    // 1. Save to DataStore so they never see it again
                     mainViewModel.completeOnboarding()
-
-                    // 2. Navigate to Home and destroy the Onboarding screen so the user can't hit the back button to return to it
                     navController.navigate(Home) {
                         popUpTo(Onboarding) { inclusive = true }
                     }
