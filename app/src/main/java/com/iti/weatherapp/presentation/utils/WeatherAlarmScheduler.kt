@@ -18,6 +18,7 @@ class WeatherAlarmScheduler @Inject constructor(
         val intent = Intent(context, WeatherAlarmReceiver::class.java).apply {
             putExtra(Constants.EXTRA_ALERT_TYPE, alert.alertType.name)
             putExtra(Constants.EXTRA_ALERT_ID, alert.id)
+            putExtra(Constants.EXTRA_SOUND_URI, alert.customSoundUri)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(

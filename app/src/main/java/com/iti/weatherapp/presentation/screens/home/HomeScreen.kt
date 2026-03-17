@@ -56,7 +56,7 @@ fun HomeScreen(
     val error = viewModel.error.value
     val weatherData = viewModel.weatherData.value
     val tempUnitSuffix = WeatherFormatters.getTempSuffix(viewModel.tempUnit.value)
-    val windUnitSuffix = if (viewModel.windUnit.value == "miles_hour") stringResource(R.string.wind_mph) else stringResource(R.string.wind_ms)
+    val windUnitSuffix =  WeatherFormatters.getWindSuffix(context, viewModel.windUnit.value)
 
     val tempUnitPref = viewModel.tempUnit.value
     val windUnitPref = viewModel.windUnit.value

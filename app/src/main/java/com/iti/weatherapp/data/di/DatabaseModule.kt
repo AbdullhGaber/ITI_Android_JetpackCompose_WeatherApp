@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.iti.weatherapp.data.local.db.WeatherDatabase
 import com.iti.weatherapp.data.local.db.daos.FavoriteLocationsDao
 import com.iti.weatherapp.data.local.db.daos.WeatherAlertsDao
+import com.iti.weatherapp.data.local.db.type_converter.AlertsConverter
 import com.iti.weatherapp.data.local.db.type_converter.WeatherForecastConverters
 import com.iti.weatherapp.data.utils.GsonParser
 import dagger.Module
@@ -27,9 +28,11 @@ object DatabaseModule {
             context,
             WeatherDatabase::class.java,
             "weather_database"
-        ).fallbackToDestructiveMigration(false).addTypeConverter(
-                WeatherForecastConverters(GsonParser(Gson()))
-            ).build()
+        )
+            .fallbackToDestructiveMigration(false)
+            .addTypeConverter(WeatherForecastConverters(GsonParser(Gson())))
+            .addTypeConverter(AlertsConverter(GsonParser(Gson())))
+            .build()
     }
 
     @Provides

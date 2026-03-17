@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +37,7 @@ import com.iti.weatherapp.presentation.screens.alerts.components.AlertItemCard
 import java.util.Calendar
 import androidx.core.net.toUri
 import com.iti.weatherapp.presentation.components.EmptyStateView
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +67,9 @@ fun AlertsScreen(
         if (isGranted) {
             showBottomSheet = true
         } else {
-            Toast.makeText(context, "Notification permission is required to show alerts.", Toast.LENGTH_LONG).show()
+            @SuppressLint("LocalContextGetResourceValueCall")
+            Toast.makeText(context,
+                context.getString(R.string.notification_permission_is_required_to_show_alerts), Toast.LENGTH_LONG).show()
         }
     }
 

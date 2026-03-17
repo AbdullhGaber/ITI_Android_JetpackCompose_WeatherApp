@@ -2,10 +2,8 @@ package com.iti.weatherapp.data.local.db.type_converter
 
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.iti.weatherapp.data.models.ForecastResponse
-import com.iti.weatherapp.data.utils.GsonParser
 import com.iti.weatherapp.data.utils.JsonParser
 import kotlin.jvm.java
 

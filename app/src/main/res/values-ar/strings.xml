@@ -50,4 +50,18 @@
     <string name="no_alerts">لا توجد تنبيهات مجدولة حتى الآن.\nاضغط على رمز الجرس لإضافة واحد.</string>
     <string name="no_favorites">لا توجد اماكن مفضلة حتى الآن.\nاضغط على رمز المفضلة لإضافة مكان.</string>
     <string name="cancel_alarm">الغاء المنبه</string>
+    <string name="new_weather_alert">تنبيه طقس جديد</string>
+    <string name="weather_condition">حالة الطقس</string>
+    <string name="high_temperature">حرارة مرتفعة</string>
+    <string name="low_temperature">حرارة منخفضة</string>
+    <string name="strong_wind">رياح قوية</string>
+    <string name="expected_rain">مطر متوقع</string>
+    <string name="very_cloudy">غائم جداً</string>
+    <string name="threshold_limit">الحد</string>
+    <string name="active_time_period">الفترة الزمنية النشطة</string>
+    <string name="alert_type">نوع التنبيه</string>
+    <string name="save_alert">حفظ التنبيه</string>
+    <string name="notification_sound">صوت الاشعارات</string>
+    <string name="notification_permission_is_required_to_show_alerts">اذن الاشعارات مطلوب لاظهار التنبيهات</string>
+    <string name="wind_speed_threshold">حد سرعة الرياح</string>
 </resources>

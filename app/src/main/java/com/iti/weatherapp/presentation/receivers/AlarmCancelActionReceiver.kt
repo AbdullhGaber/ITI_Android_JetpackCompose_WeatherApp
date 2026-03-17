@@ -21,7 +21,7 @@ class AlarmCancelActionReceiver : BroadcastReceiver() {
         val alertId = intent.getIntExtra(Constants.EXTRA_ALERT_ID, -1)
         if (alertId == -1) return
 
-        AlarmSoundManager.stopAlarm()
+        AlarmSoundManager.stopSound()
 
         val notificationManager = context.getSystemService(NotificationManager::class.java)
 

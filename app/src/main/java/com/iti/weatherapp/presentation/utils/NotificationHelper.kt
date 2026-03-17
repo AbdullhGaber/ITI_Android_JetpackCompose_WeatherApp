@@ -1,5 +1,6 @@
 package com.iti.weatherapp.presentation.utils
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -14,7 +15,7 @@ import com.iti.weatherapp.presentation.utils.Constants.NAVIGATE_TO_ALERTS
 import kotlin.jvm.java
 
 object NotificationHelper {
-    private const val ALARM_CHANNEL_ID = "weather_alarm_channel_v2"
+    const val ALARM_CHANNEL_ID = "weather_alarm_channel_v2"
     private const val NOTIFICATION_CHANNEL_ID = "weather_standard_channel"
 
     fun createNotificationChannels(context: Context) {
@@ -31,6 +32,7 @@ object NotificationHelper {
         }
         val standardChannel = NotificationChannel(NOTIFICATION_CHANNEL_ID, "Weather Notifications", NotificationManager.IMPORTANCE_DEFAULT).apply {
             description = "Standard weather updates"
+            setSound(null, null)
         }
 
         manager.createNotificationChannel(alarmChannel)
@@ -45,8 +47,21 @@ object NotificationHelper {
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    fun showAlarmNotification(context: Context, alertId: Int, title: String, message: String, isUpdate: Boolean = false) {
-        val notificationManager = context.getSystemService(NotificationManager::class.java)
+    private fun getAlertWakeupScreenPendingIntent(context: Context, alertId : Int): PendingIntent {
+        val fullScreenIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("IS_ALARM_FIRING", true)
+            putExtra(EXTRA_ALERT_ID, alertId)
+        }
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            context, alertId, fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        return fullScreenPendingIntent
+    }
+
+    fun buildAlarmNotification(context: Context, alertId: Int, title: String, message: String, isUpdate: Boolean = false) : Notification{
+        createNotificationChannels(context)
 
         val cancelIntent = Intent(context, AlarmCancelActionReceiver::class.java).apply {
             putExtra(EXTRA_ALERT_ID, alertId)
@@ -63,13 +78,14 @@ object NotificationHelper {
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setOngoing(true)
             .setAutoCancel(false)
-            .setFullScreenIntent(getMainActivityPendingIntent(context), true)
+            .setContentIntent(getMainActivityPendingIntent(context))
+            .setFullScreenIntent(getAlertWakeupScreenPendingIntent(context, alertId), true)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(R.string.cancel_alarm), cancelPendingIntent)
             .setDeleteIntent(cancelPendingIntent)
             .setOnlyAlertOnce(isUpdate)
             .build()
 
-        notificationManager.notify(alertId, notification)
+        return notification
     }
 
     fun showStandardNotification(context: Context, alertId: Int, title: String, message: String, isUpdate: Boolean = false) {

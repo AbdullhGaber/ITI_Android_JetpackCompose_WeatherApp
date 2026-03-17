@@ -1,5 +1,7 @@
 package com.iti.weatherapp.presentation.utils
 
+import android.content.Context
+import com.iti.weatherapp.R
 import com.iti.weatherapp.data.models.ForecastResponse
 import java.text.NumberFormat
 import java.time.Instant
@@ -95,6 +97,14 @@ object WeatherFormatters {
             "imperial" -> "°F"
             "standard" -> "K"
             else -> ""
+        }
+    }
+
+    fun getWindSuffix(context : Context, unit: String): String {
+        return if (unit == "miles_hour") {
+            context.getString(R.string.wind_mph)
+        }else{
+            context.getString(R.string.wind_ms)
         }
     }
 
