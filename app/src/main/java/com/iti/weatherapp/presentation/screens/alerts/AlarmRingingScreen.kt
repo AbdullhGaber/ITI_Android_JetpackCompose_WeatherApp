@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,7 +33,7 @@ fun AlarmRingingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F172A))
+            .background(MaterialTheme.colorScheme.background)
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -42,22 +42,22 @@ fun AlarmRingingScreen(
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF1E293B)),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             LottieIconTextView(
                 modifier = Modifier.size(64.dp),
                 animationResId = R.raw.on_boarding_3,
-                message = "Weather Alert!"
+                message = stringResource(id = R.string.weather_alert_title)
             )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Check the latest weather conditions.",
+            text = stringResource(id = R.string.weather_alert_description),
             fontSize = 18.sp,
-            color = Color(0xFF94A3B8),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 8.dp)
         )
@@ -77,19 +77,23 @@ fun AlarmRingingScreen(
                         viewModel.dismissAlarm(context)
                         onFinishActivity()
                     },
-                    containerColor = Color(0xFFF44336),
-                    contentColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError,
                     modifier = Modifier.size(72.dp),
                     shape = CircleShape
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = "Dismiss", modifier = Modifier.size(32.dp))
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(id = R.string.dismiss),
+                        modifier = Modifier.size(32.dp)
+                    )
                 }
                 Text(
-                    text = "Dismiss",
-                    color = Color.White,
+                    text = stringResource(id = R.string.dismiss),
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .padding(top = 12.dp)
-                        .wrapContentWidth(unbounded = true) // Allow safe overflow
+                        .wrapContentWidth(unbounded = true)
                 )
             }
 
@@ -102,16 +106,20 @@ fun AlarmRingingScreen(
                         viewModel.snoozeAlarm(context, alertId)
                         onFinishActivity()
                     },
-                    containerColor = Color(0xFF4A90E2),
-                    contentColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(72.dp),
                     shape = CircleShape
                 ) {
-                    Icon(Icons.Default.Snooze, contentDescription = "Snooze", modifier = Modifier.size(32.dp))
+                    Icon(
+                        imageVector = Icons.Default.Snooze,
+                        contentDescription = stringResource(id = R.string.snooze),
+                        modifier = Modifier.size(32.dp)
+                    )
                 }
                 Text(
-                    text = "Snooze +10m",
-                    color = Color.White,
+                    text = stringResource(id = R.string.snooze_10m),
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .padding(top = 12.dp)
                         .wrapContentWidth(unbounded = true)

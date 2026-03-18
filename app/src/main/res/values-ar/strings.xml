@@ -64,5 +64,9 @@
     <string name="notification_sound">صوت الاشعارات</string>
     <string name="notification_permission_is_required_to_show_alerts">اذن الاشعارات مطلوب لاظهار التنبيهات</string>
     <string name="wind_speed_threshold">حد سرعة الرياح</string>
-    <string name="snooze_alarm">غفوة (10 دقائق)</string>
+    <string name="snooze_10m">غفوة (10 دقائق)</string>
+    <string name="weather_alert_title">تنبيه الطقس!</string>
+    <string name="weather_alert_description">تحقق من أحدث حالة للطقس.</string>
+    <string name="dismiss">إيقاف</string>
+    <string name="snooze">غفوة</string>
 </resources>
