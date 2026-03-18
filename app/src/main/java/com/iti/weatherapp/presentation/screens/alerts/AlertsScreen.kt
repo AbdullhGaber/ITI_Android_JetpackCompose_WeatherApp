@@ -55,16 +55,6 @@ fun AlertsScreen(
 
     var pendingAlertToSave by remember { mutableStateOf<WeatherAlert?>(null) }
 
-    val overlayPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        if (Settings.canDrawOverlays(context)) {
-            showBottomSheet = true
-        } else {
-            Toast.makeText(context, "Overlay permission is required for Alarms.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -73,6 +63,18 @@ fun AlertsScreen(
         } else {
             @SuppressLint("LocalContextGetResourceValueCall")
             Toast.makeText(context, context.getString(R.string.notification_permission_is_required_to_show_alerts), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    val overlayPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (Settings.canDrawOverlays(context)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            Toast.makeText(context, "Overlay permission is required for Alarms.", Toast.LENGTH_SHORT).show()
         }
     }
 
