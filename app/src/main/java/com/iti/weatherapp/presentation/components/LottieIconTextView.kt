@@ -17,7 +17,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
-fun EmptyStateView(
+fun LottieIconTextView(
     modifier: Modifier = Modifier,
     animationResId: Int,
     message: String

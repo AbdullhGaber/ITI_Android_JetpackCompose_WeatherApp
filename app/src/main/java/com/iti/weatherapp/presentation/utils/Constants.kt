@@ -9,6 +9,7 @@ object Constants {
     const val ACTION_STOP_ALARM = "ACTION_STOP_ALARM"
     const val ALARM_TITLE = "ALARM_TITLE"
     const val ALARM_MESSAGE = "ALARM_MESSAGE"
+    const val IS_ALARM_FIRING = "IS_ALARM_FIRING"
 
     const val NAVIGATE_TO_ALERTS = "com.iti.weatherapp.NAVIGATE_TO_ALERTS"
 }

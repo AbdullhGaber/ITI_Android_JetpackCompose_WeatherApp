@@ -1,4 +1,4 @@
-package com.iti.weatherapp.presentation.utils
+package com.iti.weatherapp.presentation.utils.alarm_notifications
 
 import android.content.Context
 import android.media.AudioAttributes

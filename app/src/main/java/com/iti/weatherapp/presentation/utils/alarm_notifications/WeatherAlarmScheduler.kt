@@ -1,4 +1,4 @@
-package com.iti.weatherapp.presentation.utils
+package com.iti.weatherapp.presentation.utils.alarm_notifications
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import com.iti.weatherapp.data.local.db.entities.WeatherAlert
 import com.iti.weatherapp.presentation.receivers.WeatherAlarmReceiver
+import com.iti.weatherapp.presentation.utils.Constants
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

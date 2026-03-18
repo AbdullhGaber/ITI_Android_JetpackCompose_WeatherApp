@@ -2,7 +2,7 @@ package com.iti.weatherapp.data.di
 
 
 import android.content.Context
-import com.iti.weatherapp.presentation.utils.WeatherAlarmScheduler
+import com.iti.weatherapp.presentation.utils.alarm_notifications.WeatherAlarmScheduler
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

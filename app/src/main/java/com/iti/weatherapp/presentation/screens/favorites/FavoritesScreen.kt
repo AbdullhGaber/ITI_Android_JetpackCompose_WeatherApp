@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.iti.weatherapp.R
 import com.iti.weatherapp.presentation.LocalBottomPadding
-import com.iti.weatherapp.presentation.components.EmptyStateView
+import com.iti.weatherapp.presentation.components.LottieIconTextView
 import com.iti.weatherapp.presentation.screens.favorites.components.FavoriteItemCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +61,7 @@ fun FavoritesScreen(
             )
 
             if (favorites.isEmpty()) {
-                EmptyStateView(
+                LottieIconTextView(
                     animationResId = R.raw.no_favorties,
                     message = stringResource(R.string.no_favorites),
                     modifier = Modifier.weight(1f)

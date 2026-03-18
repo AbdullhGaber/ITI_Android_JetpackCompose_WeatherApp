@@ -36,8 +36,10 @@ import com.iti.weatherapp.presentation.screens.alerts.components.AddAlertBottomS
 import com.iti.weatherapp.presentation.screens.alerts.components.AlertItemCard
 import java.util.Calendar
 import androidx.core.net.toUri
-import com.iti.weatherapp.presentation.components.EmptyStateView
-
+import com.iti.weatherapp.presentation.components.LottieIconTextView
+import com.iti.weatherapp.data.local.db.entities.AlertType
+import com.iti.weatherapp.data.local.db.entities.WeatherAlert
+import com.iti.weatherapp.presentation.utils.oem.OemPermissionStrategy
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +51,9 @@ fun AlertsScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val dynamicBottomPadding = LocalBottomPadding.current
     val context = LocalContext.current
+    var activeStrategy by remember { mutableStateOf<OemPermissionStrategy?>(null) }
+
+    var pendingAlertToSave by remember { mutableStateOf<WeatherAlert?>(null) }
 
     val overlayPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -60,7 +65,6 @@ fun AlertsScreen(
         }
     }
 
-
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -68,8 +72,54 @@ fun AlertsScreen(
             showBottomSheet = true
         } else {
             @SuppressLint("LocalContextGetResourceValueCall")
-            Toast.makeText(context,
-                context.getString(R.string.notification_permission_is_required_to_show_alerts), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.notification_permission_is_required_to_show_alerts), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    val showOnLockScreenPermission = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        activeStrategy?.let { viewModel.markStrategyAsAsked(it) }
+
+        val isGranted = activeStrategy?.isPermissionGranted(context) ?: false
+
+        if (isGranted) {
+            pendingAlertToSave?.let {
+                viewModel.saveAlert(it)
+                showBottomSheet = false
+            }
+        } else {
+            Toast.makeText(context, "Permission is required to wake the screen for alarms.", Toast.LENGTH_LONG).show()
+        }
+        pendingAlertToSave = null
+        activeStrategy = null
+    }
+
+    val autostartBackgroundPermission = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        activeStrategy?.let { viewModel.markStrategyAsAsked(it) }
+
+        val isGranted = activeStrategy?.isPermissionGranted(context) ?: false
+
+        if (isGranted) {
+            val nextStrategy = viewModel.getRequiredPermissionStrategy(context)
+
+            if (nextStrategy != null) {
+                activeStrategy = nextStrategy
+                showOnLockScreenPermission.launch(nextStrategy.getPermissionIntent(context))
+            } else {
+                pendingAlertToSave?.let {
+                    viewModel.saveAlert(it)
+                    showBottomSheet = false
+                }
+                pendingAlertToSave = null
+                activeStrategy = null
+            }
+        } else {
+            Toast.makeText(context, "Permission is required to wake the screen for alarms.", Toast.LENGTH_LONG).show()
+            pendingAlertToSave = null
+            activeStrategy = null
         }
     }
 
@@ -128,10 +178,8 @@ fun AlertsScreen(
             )
 
             if (alerts.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ){
-                    EmptyStateView(
+                Box(modifier = Modifier.fillMaxSize()){
+                    LottieIconTextView(
                         animationResId = R.raw.no_alerts,
                         message = stringResource(R.string.no_alerts),
                         modifier = Modifier.align(Center)
@@ -146,9 +194,7 @@ fun AlertsScreen(
                         AlertItemCard(
                             alert = alert,
                             onDelete = { viewModel.deleteAlert(alert) },
-                            onUpdate = { updatedAlert -> viewModel.updateAlert(
-                                alert = updatedAlert,
-                            )}
+                            onUpdate = { updatedAlert -> viewModel.updateAlert(alert = updatedAlert) }
                         )
                     }
                 }
@@ -164,6 +210,18 @@ fun AlertsScreen(
         ) {
             AddAlertBottomSheetContent(
                 onSave = { newAlert ->
+                    if (newAlert.alertType == AlertType.ALARM) {
+                        val strategy = viewModel.getRequiredPermissionStrategy(context)
+
+                        if (strategy != null) {
+                            pendingAlertToSave = newAlert
+                            activeStrategy = strategy
+                            autostartBackgroundPermission.launch(strategy.getPermissionIntent(context))
+                            Toast.makeText(context, strategy.getToastMessage(context), Toast.LENGTH_LONG).show()
+                            return@AddAlertBottomSheetContent
+                        }
+                    }
+
                     viewModel.saveAlert(newAlert)
                     showBottomSheet = false
                 },
@@ -172,7 +230,6 @@ fun AlertsScreen(
         }
     }
 }
-
 
 fun showNativeDateTimePicker(context: Context, onDateTimeSelected: (Long) -> Unit) {
     val calendar = Calendar.getInstance()

@@ -2,7 +2,6 @@ package com.iti.weatherapp.data.local.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
@@ -20,12 +19,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = DATASTORE_NAME)
 
 @Singleton
 class SettingsPreferences @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = DATASTORE_NAME)
     companion object Keys{
         val LOCATION_METHOD = stringPreferencesKey("location_method")
         val UNIT_TEMP = stringPreferencesKey("unit_temp")
@@ -37,8 +36,9 @@ class SettingsPreferences @Inject constructor(
         val CUSTOM_LNG = doublePreferencesKey("custom_lng")
         val CURRENT_LAT = doublePreferencesKey("current_lat")
         val CURRENT_LNG = doublePreferencesKey("current_lng")
-
         val HAS_SEEN_ONBOARDING = booleanPreferencesKey("has_seen_onboarding")
+        val HAS_ASKED_OEM_PERMISSION = booleanPreferencesKey("has_asked_oem_permission")
+        val HAS_ASKED_AUTO_START = booleanPreferencesKey("has_asked_background_autostart_permission")
     }
     val locationMethodFlow: Flow<String> = context.dataStore.data.map { prefs -> prefs[LOCATION_METHOD] ?: "gps" }
     val tempUnitFlow: Flow<String> = context.dataStore.data.map { prefs -> prefs[UNIT_TEMP] ?: "metric" }
@@ -54,6 +54,24 @@ class SettingsPreferences @Inject constructor(
     suspend fun saveOnboardingState(completed: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[HAS_SEEN_ONBOARDING] = completed
+        }
+    }
+
+    val hasAskedOemPermissionFlow: Flow<Boolean> =
+        context.dataStore.data.map { it[HAS_ASKED_OEM_PERMISSION] ?: false }
+
+    suspend fun saveOemPermissionAsked(asked: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[HAS_ASKED_OEM_PERMISSION] = asked
+        }
+    }
+
+    val hasAskedAutoStartFlow: Flow<Boolean> =
+        context.dataStore.data.map { it[HAS_ASKED_AUTO_START] ?: false }
+
+    suspend fun saveAutoStartAsked(asked: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[HAS_ASKED_AUTO_START] = asked
         }
     }
     val themeFlow: Flow<AppTheme> = context.dataStore.data.map {

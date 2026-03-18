@@ -63,4 +63,5 @@
     <string name="notification_sound">Notification Sound</string>
     <string name="notification_permission_is_required_to_show_alerts">Notification permission is required to show alerts.</string>
     <string name="wind_speed_threshold">Wind Speed Threshold</string>
+    <string name="snooze_alarm">Snooze (10 min)</string>
 </resources>

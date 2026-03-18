@@ -1,4 +1,4 @@
-package com.iti.weatherapp.presentation.utils
+package com.iti.weatherapp.presentation.utils.alarm_notifications
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -6,11 +6,14 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
 import androidx.core.app.NotificationCompat
 import com.iti.weatherapp.R
 import com.iti.weatherapp.presentation.MainActivity
 import com.iti.weatherapp.presentation.receivers.AlarmCancelActionReceiver
+import com.iti.weatherapp.presentation.receivers.AlarmSnoozeActionReceiver
 import com.iti.weatherapp.presentation.utils.Constants.EXTRA_ALERT_ID
+import com.iti.weatherapp.presentation.utils.Constants.IS_ALARM_FIRING
 import com.iti.weatherapp.presentation.utils.Constants.NAVIGATE_TO_ALERTS
 import kotlin.jvm.java
 
@@ -21,8 +24,8 @@ object NotificationHelper {
     fun createNotificationChannels(context: Context) {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val alarmAudioAttributes = android.media.AudioAttributes.Builder()
-            .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+        val alarmAudioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
             .build()
 
         val alarmChannel = NotificationChannel(ALARM_CHANNEL_ID, "Weather Alarms", NotificationManager.IMPORTANCE_HIGH).apply {
@@ -50,7 +53,7 @@ object NotificationHelper {
     private fun getAlertWakeupScreenPendingIntent(context: Context, alertId : Int): PendingIntent {
         val fullScreenIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("IS_ALARM_FIRING", true)
+            putExtra(IS_ALARM_FIRING, true)
             putExtra(EXTRA_ALERT_ID, alertId)
         }
         val fullScreenPendingIntent = PendingIntent.getActivity(
@@ -70,6 +73,14 @@ object NotificationHelper {
             context, alertId, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val snoozeIntent = Intent(context, AlarmSnoozeActionReceiver::class.java).apply {
+            putExtra(EXTRA_ALERT_ID, alertId)
+        }
+
+        val snoozePendingIntent = PendingIntent.getBroadcast(
+            context, alertId + 10000, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(context, ALARM_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(title)
@@ -80,6 +91,7 @@ object NotificationHelper {
             .setAutoCancel(false)
             .setContentIntent(getMainActivityPendingIntent(context))
             .setFullScreenIntent(getAlertWakeupScreenPendingIntent(context, alertId), true)
+            .addAction(android.R.drawable.ic_popup_sync, context.getString(R.string.snooze_alarm), snoozePendingIntent)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(R.string.cancel_alarm), cancelPendingIntent)
             .setDeleteIntent(cancelPendingIntent)
             .setOnlyAlertOnce(isUpdate)

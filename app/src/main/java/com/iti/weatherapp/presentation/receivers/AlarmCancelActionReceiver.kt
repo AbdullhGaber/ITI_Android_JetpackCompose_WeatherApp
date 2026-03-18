@@ -5,8 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.iti.weatherapp.data.repository.Repository
-import com.iti.weatherapp.presentation.utils.AlarmSoundManager
+import com.iti.weatherapp.presentation.services.WeatherAlarmService
 import com.iti.weatherapp.presentation.utils.Constants
+import com.iti.weatherapp.presentation.utils.Constants.ACTION_STOP_ALARM
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,11 +22,15 @@ class AlarmCancelActionReceiver : BroadcastReceiver() {
         val alertId = intent.getIntExtra(Constants.EXTRA_ALERT_ID, -1)
         if (alertId == -1) return
 
-        AlarmSoundManager.stopSound()
-
         val notificationManager = context.getSystemService(NotificationManager::class.java)
-
         notificationManager.cancel(alertId)
+
+        val stopServiceIntent = Intent(context, WeatherAlarmService::class.java)
+            .apply {
+                action = ACTION_STOP_ALARM
+            }
+
+        context.startService(stopServiceIntent)
 
         CoroutineScope(Dispatchers.IO).launch {
             val alert = repository.getAlertById(alertId)

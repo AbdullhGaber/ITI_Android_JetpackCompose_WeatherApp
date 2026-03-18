@@ -12,14 +12,14 @@ import com.iti.weatherapp.data.local.preferences.SettingsPreferences
 import com.iti.weatherapp.data.repository.Repository
 import com.iti.weatherapp.data.utils.ApiState
 import com.iti.weatherapp.presentation.services.WeatherAlarmService
-import com.iti.weatherapp.presentation.utils.AlarmSoundManager
+import com.iti.weatherapp.presentation.utils.alarm_notifications.AlarmSoundManager
 import com.iti.weatherapp.presentation.utils.Constants.ACTION_START_ALARM
 import com.iti.weatherapp.presentation.utils.Constants.ALARM_MESSAGE
 import com.iti.weatherapp.presentation.utils.Constants.ALARM_TITLE
 import com.iti.weatherapp.presentation.utils.Constants.EXTRA_ALERT_ID
 import com.iti.weatherapp.presentation.utils.Constants.EXTRA_ALERT_TYPE
 import com.iti.weatherapp.presentation.utils.Constants.EXTRA_SOUND_URI
-import com.iti.weatherapp.presentation.utils.NotificationHelper
+import com.iti.weatherapp.presentation.utils.alarm_notifications.NotificationHelper
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

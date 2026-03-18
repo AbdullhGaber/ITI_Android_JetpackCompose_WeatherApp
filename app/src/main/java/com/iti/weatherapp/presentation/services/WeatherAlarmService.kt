@@ -3,14 +3,14 @@ package com.iti.weatherapp.presentation.services
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import com.iti.weatherapp.presentation.utils.AlarmSoundManager
+import com.iti.weatherapp.presentation.utils.alarm_notifications.AlarmSoundManager
 import com.iti.weatherapp.presentation.utils.Constants.ACTION_START_ALARM
 import com.iti.weatherapp.presentation.utils.Constants.ACTION_STOP_ALARM
 import com.iti.weatherapp.presentation.utils.Constants.ALARM_MESSAGE
 import com.iti.weatherapp.presentation.utils.Constants.ALARM_TITLE
 import com.iti.weatherapp.presentation.utils.Constants.EXTRA_ALERT_ID
 import com.iti.weatherapp.presentation.utils.Constants.EXTRA_SOUND_URI
-import com.iti.weatherapp.presentation.utils.NotificationHelper
+import com.iti.weatherapp.presentation.utils.alarm_notifications.NotificationHelper
 
 class WeatherAlarmService : Service() {
 
