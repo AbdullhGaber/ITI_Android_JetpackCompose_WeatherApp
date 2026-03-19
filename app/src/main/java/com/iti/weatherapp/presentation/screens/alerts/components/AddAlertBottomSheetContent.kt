@@ -1,10 +1,12 @@
 package com.iti.weatherapp.presentation.screens.alerts.components
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -33,6 +35,8 @@ import com.iti.weatherapp.data.local.db.entities.AlertType
 import com.iti.weatherapp.data.local.db.entities.WeatherAlert
 import com.iti.weatherapp.presentation.screens.alerts.showNativeDateTimePicker
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
+import com.iti.weatherapp.presentation.utils.validation.AlertValidator
+
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -305,18 +309,27 @@ fun AddAlertBottomSheetContent(
 
             Button(
                 onClick = {
-                    onSave(
-                        WeatherAlert(
-                            startDateTimestamp = startTime,
-                            endDateTimestamp = endTime,
-                            alertType = selectedType,
-                            tempThreshold = tempThreshold,
-                            windThreshold = windThreshold,
-                            conditions = selectedConditions.toList(),
-                            customSoundName = selectedSoundName,
-                            customSoundUri = selectedSoundUri
-                        )
+                    val alertToSave = WeatherAlert(
+                        startDateTimestamp = startTime,
+                        endDateTimestamp = endTime,
+                        alertType = selectedType,
+                        tempThreshold = tempThreshold,
+                        windThreshold = windThreshold,
+                        conditions = selectedConditions.toList(),
+                        customSoundName = selectedSoundName,
+                        customSoundUri = selectedSoundUri
                     )
+
+                    val validationResult = AlertValidator.validateAlertTime(alertToSave)
+
+                    if (validationResult.isSuccessful) {
+                        onSave(alertToSave)
+                    } else {
+                        validationResult.errorMessageResId?.let { errorId ->
+                            @SuppressLint("LocalContextGetResourceValueCall")
+                            Toast.makeText(context, context.getString(errorId), Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(

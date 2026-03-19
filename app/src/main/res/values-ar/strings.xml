@@ -69,4 +69,7 @@
     <string name="weather_alert_description">تحقق من أحدث حالة للطقس.</string>
     <string name="dismiss">إيقاف</string>
     <string name="snooze">غفوة</string>
+    <string name="error_start_time_past">لا يمكن أن يكون وقت البدء في الماضي.</string>
+    <string name="error_end_time_before_start">يجب أن يكون وقت الانتهاء بعد وقت البدء.</string>
+    <string name="error_end_time_past">لا يمكن أن يكون وقت الانتهاء في الماضي.</string>
 </resources>

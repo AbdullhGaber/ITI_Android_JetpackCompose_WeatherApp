@@ -31,7 +31,7 @@ class AlertsViewModel @Inject constructor(
     val hasAskedAutoStart : StateFlow<Boolean> = settingsPreferences.hasAskedAutoStartFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    val hasAskedOemPermission : StateFlow<Boolean> = settingsPreferences.hasAskedAutoStartFlow
+    val hasAskedOemPermission : StateFlow<Boolean> = settingsPreferences.hasAskedOemPermissionFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private fun markAutoStartAsAsked() {

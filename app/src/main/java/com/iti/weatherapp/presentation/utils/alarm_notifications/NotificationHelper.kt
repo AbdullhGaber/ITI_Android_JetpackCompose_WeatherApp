@@ -91,7 +91,7 @@ object NotificationHelper {
             .setAutoCancel(false)
             .setContentIntent(getMainActivityPendingIntent(context))
             .setFullScreenIntent(getAlertWakeupScreenPendingIntent(context, alertId), true)
-            .addAction(android.R.drawable.ic_popup_sync, context.getString(R.string.snooze_alarm), snoozePendingIntent)
+            .addAction(android.R.drawable.ic_popup_sync, context.getString(R.string.snooze), snoozePendingIntent)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(R.string.cancel_alarm), cancelPendingIntent)
             .setDeleteIntent(cancelPendingIntent)
             .setOnlyAlertOnce(isUpdate)
