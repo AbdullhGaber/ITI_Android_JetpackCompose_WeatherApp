@@ -1,5 +1,8 @@
 package com.iti.weatherapp.presentation.screens.home
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,9 +17,7 @@ import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,9 +31,8 @@ import com.google.android.gms.location.LocationServices
 import com.iti.weatherapp.R
 import com.iti.weatherapp.data.models.ForecastItem
 import com.iti.weatherapp.data.models.ForecastResponse
-import com.iti.weatherapp.presentation.utils.WeatherFormatters
-import androidx.compose.runtime.*
 import com.iti.weatherapp.presentation.LocalBottomPadding
+import com.iti.weatherapp.presentation.components.AnimatedActionState
 import com.iti.weatherapp.presentation.screens.home.components.DailyForecastSection
 import com.iti.weatherapp.presentation.screens.home.components.HomeShimmerLoading
 import com.iti.weatherapp.presentation.screens.home.components.HorizontalWeatherMetricItem
@@ -40,6 +40,7 @@ import com.iti.weatherapp.presentation.screens.home.components.HourlyForecastSec
 import com.iti.weatherapp.presentation.screens.home.components.VerticalWeatherMetricItem
 import com.iti.weatherapp.presentation.utils.LocationUtils
 import com.iti.weatherapp.presentation.utils.PermissionUtils
+import com.iti.weatherapp.presentation.utils.WeatherFormatters
 import kotlinx.coroutines.launch
 
 @Composable
@@ -62,9 +63,10 @@ fun HomeScreen(
     val windUnitPref = viewModel.windUnit.value
     val scope = rememberCoroutineScope()
 
+    var showPermissionError by remember { mutableStateOf(false) }
     val fallBackMessage = stringResource(R.string.fallback_called)
 
-    val fetchGpsLocation = {
+    val fetchGpsLocation: () -> Unit = {
         scope.launch {
             val location = LocationUtils.getCurrentLocation(fusedLocationClient)
             if (location != null) {
@@ -76,22 +78,34 @@ fun HomeScreen(
         }
     }
 
+    val settingsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (PermissionUtils.hasLocationPermissions(context)) {
+            showPermissionError = false
+            fetchGpsLocation()
+        }
+    }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val granted = permissions.values.any { it }
         if (granted) {
+            showPermissionError = false
             fetchGpsLocation()
         } else {
-            viewModel.getWeatherData(31.2001, 29.9187)
+            showPermissionError = true
         }
     }
 
-    val triggerWeatherUpdate = {
+    val triggerWeatherUpdate: () -> Unit = {
         if (locationMethod == "map") {
+            showPermissionError = false
             viewModel.getWeatherData(customLocation.first, customLocation.second)
         } else {
             if (PermissionUtils.hasLocationPermissions(context)) {
+                showPermissionError = false
                 fetchGpsLocation()
             } else {
                 permissionLauncher.launch(PermissionUtils.locationPermissions)
@@ -99,7 +113,7 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(locationMethod,customLocation) {
+    LaunchedEffect(locationMethod, customLocation) {
         triggerWeatherUpdate()
     }
 
@@ -109,20 +123,34 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        if (isLoading && weatherData == null) {
-            HomeShimmerLoading()
-        } else if (error != null) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "${stringResource(R.string.error)}: $error",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(16.dp)
-                )
-                Button(onClick = { triggerWeatherUpdate() }) {
-                    Text(stringResource(R.string.retry))
+        if (showPermissionError && locationMethod == "gps") {
+            AnimatedActionState(
+                lottieResId = R.raw.no_location,
+                title = stringResource(R.string.location_permission_title),
+                description = stringResource(R.string.location_permission_desc),
+                buttonText = stringResource(R.string.open_settings),
+                onActionClick = {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                    }
+                    // Launch with our new settingsLauncher instead of context.startActivity
+                    settingsLauncher.launch(intent)
                 }
-            }
-        } else if (weatherData != null) {
+            )
+        }
+        else if (isLoading && weatherData == null) {
+            HomeShimmerLoading()
+        }
+        else if (error != null) {
+            AnimatedActionState(
+                lottieResId = R.raw.no_internet,
+                title = stringResource(R.string.no_internet_title),
+                description = stringResource(R.string.no_internet_desc),
+                buttonText = stringResource(R.string.retry),
+                onActionClick = { triggerWeatherUpdate() }
+            )
+        }
+        else if (weatherData != null) {
             HomeContent(
                 forecast = weatherData,
                 tempUnitPref = tempUnitPref,

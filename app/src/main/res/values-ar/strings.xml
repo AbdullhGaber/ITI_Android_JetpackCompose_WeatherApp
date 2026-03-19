@@ -77,4 +77,9 @@
     <string name="delete_alert_message">هل أنت متأكد أنك تريد حذف تنبيه الطقس هذا؟ لا يمكن التراجع عن هذا الإجراء.</string>
     <string name="delete_favorite_title">إزالة من المفضلة؟</string>
     <string name="delete_favorite_message">هل أنت متأكد أنك تريد إزالة هذا الموقع من قائمة المفضلة لديك؟</string>
+    <string name="no_internet_title">لا يوجد اتصال بالإنترنت</string>
+    <string name="no_internet_desc">يرجى التحقق من إعدادات الشبكة الخاصة بك والتأكد من اتصالك بالإنترنت.</string>
+    <string name="location_permission_title">الموقع مطلوب</string>
+    <string name="location_permission_desc">نحتاج إلى إذن الموقع الخاص بك لجلب بيانات الطقس الدقيقة في الوقت الفعلي لمنطقتك.</string>
+    <string name="open_settings">فتح الإعدادات</string>
 </resources>

@@ -76,4 +76,9 @@
     <string name="delete_alert_message">Are you sure you want to delete this weather alert? This action cannot be undone.</string>
     <string name="delete_favorite_title">Remove Favorite?</string>
     <string name="delete_favorite_message">Are you sure you want to remove this location from your favorites?</string>
+    <string name="no_internet_title">No Internet Connection</string>
+    <string name="no_internet_desc">Please check your network settings and make sure you are connected to the internet.</string>
+    <string name="location_permission_title">Location Required</string>
+    <string name="location_permission_desc">We need your location permission to fetch accurate, real-time weather data for your area.</string>
+    <string name="open_settings">Open Settings</string>
 </resources>
