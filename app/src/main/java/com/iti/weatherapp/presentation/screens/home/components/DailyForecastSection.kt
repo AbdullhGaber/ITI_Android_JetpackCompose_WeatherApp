@@ -21,12 +21,15 @@ fun DailyForecastSection(
     windUnitSuffix: String,
     timezoneOffset: Int
 ) {
+    val overallMin = dailyItems.minOfOrNull { it.minTemp } ?: 0.0
+    val overallMax = dailyItems.maxOfOrNull { it.maxTemp } ?: 0.0
+
     Column {
         Text(text = stringResource(R.string.five_day_forecast), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(modifier = Modifier.height(8.dp))
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             dailyItems.forEach { item ->
-                DailyItem(item, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset)
+                DailyItem(item, overallMin, overallMax, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset)
             }
         }
     }

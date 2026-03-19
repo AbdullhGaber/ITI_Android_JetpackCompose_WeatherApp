@@ -6,7 +6,6 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import coil.compose.AsyncImage
 import com.google.android.gms.location.LocationServices
 import com.iti.weatherapp.R
 import com.iti.weatherapp.data.models.ForecastItem
@@ -34,9 +32,11 @@ import com.iti.weatherapp.data.models.ForecastResponse
 import com.iti.weatherapp.presentation.LocalBottomPadding
 import com.iti.weatherapp.presentation.components.AnimatedActionState
 import com.iti.weatherapp.presentation.screens.home.components.DailyForecastSection
+import com.iti.weatherapp.presentation.screens.home.components.DynamicWeatherBackground
 import com.iti.weatherapp.presentation.screens.home.components.HomeShimmerLoading
 import com.iti.weatherapp.presentation.screens.home.components.HorizontalWeatherMetricItem
 import com.iti.weatherapp.presentation.screens.home.components.HourlyForecastSection
+import com.iti.weatherapp.presentation.screens.home.components.AnimatedWeatherIcon
 import com.iti.weatherapp.presentation.screens.home.components.VerticalWeatherMetricItem
 import com.iti.weatherapp.presentation.utils.LocationUtils
 import com.iti.weatherapp.presentation.utils.PermissionUtils
@@ -121,11 +121,11 @@ fun HomeScreen(
         triggerWeatherUpdate()
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
+    val currentWeatherCode = weatherData?.forecastList?.firstOrNull()?.weatherConditions?.firstOrNull()?.icon
+
+    DynamicWeatherBackground(
+        weatherCode = currentWeatherCode,
+        modifier = Modifier.fillMaxSize()
     ) {
         if (showPermissionError && locationMethod == "gps") {
             AnimatedActionState(
@@ -271,12 +271,10 @@ fun MainWeatherCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                AsyncImage(
-                    model = "https://openweathermap.org/img/wn/${forecast.weatherConditions.first().icon}@4x.png",
-                    contentDescription = forecast.weatherConditions.first().description,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .offset(x = (-10).dp)
+                AnimatedWeatherIcon(
+                    weatherCode = forecast.weatherConditions.first().icon,
+                    iconSize = 120.dp,
+                    modifier = Modifier.offset(x = (-10).dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(verticalArrangement = Arrangement.Center) {

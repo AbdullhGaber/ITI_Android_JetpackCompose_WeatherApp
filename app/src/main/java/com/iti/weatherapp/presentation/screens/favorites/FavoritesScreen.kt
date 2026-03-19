@@ -107,11 +107,25 @@ fun FavoritesContent(
                         items = favorites,
                         key = { it.id }
                     ) { location ->
-                        FavoriteItemCard(
-                            location = location,
-                            onClick = { onNavigateToDetails(location.latitude, location.longitude, location.cityName) },
-                            onDelete = { onDeleteClick(location) }
-                        )
+                        var isVisible by remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) { isVisible = true }
+                        
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = isVisible,
+                            enter = androidx.compose.animation.scaleIn(
+                                initialScale = 0.8f,
+                                animationSpec = androidx.compose.animation.core.spring(
+                                    dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                                    stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+                                )
+                            ) + androidx.compose.animation.fadeIn()
+                        ) {
+                            FavoriteItemCard(
+                                location = location,
+                                onClick = { onNavigateToDetails(location.latitude, location.longitude, location.cityName) },
+                                onDelete = { onDeleteClick(location) }
+                            )
+                        }
                     }
                 }
             }

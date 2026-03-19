@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.iti.weatherapp.data.models.ForecastItem
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
 
@@ -39,10 +38,9 @@ fun HourlyItem(item: ForecastItem, tempUnitPref: String, tempUnitSuffix: String,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Text(text = WeatherFormatters.formatHourlyTime(item.timestamp, timezoneOffset), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-        AsyncImage(
-            model = "https://openweathermap.org/img/wn/${item.weatherConditions.first().icon}.png",
-            contentDescription = null,
-            modifier = Modifier.size(35.dp)
+        AnimatedWeatherIcon(
+            weatherCode = item.weatherConditions.first().icon,
+            iconSize = 35.dp
         )
         Text(text = "$formattedTemp$tempUnitSuffix", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
     }

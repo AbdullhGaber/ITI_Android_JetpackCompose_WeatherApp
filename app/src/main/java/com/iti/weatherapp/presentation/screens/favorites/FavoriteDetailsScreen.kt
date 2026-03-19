@@ -1,6 +1,6 @@
 package com.iti.weatherapp.presentation.screens.favorites
 
-import androidx.compose.foundation.background
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -18,6 +18,7 @@ import com.iti.weatherapp.R
 import com.iti.weatherapp.presentation.LocalBottomPadding
 import com.iti.weatherapp.presentation.screens.home.HomeContent
 import com.iti.weatherapp.presentation.screens.home.components.HomeShimmerLoading
+import com.iti.weatherapp.presentation.screens.home.components.DynamicWeatherBackground
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,13 +59,16 @@ fun FavoriteDetailsScreen(
             )
         }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
+        val currentWeatherCode = weatherData?.forecastList?.firstOrNull()?.weatherConditions?.firstOrNull()?.icon
+        
+        DynamicWeatherBackground(
+            weatherCode = currentWeatherCode,
+            modifier = Modifier.padding(innerPadding)
         ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
             if (isLoading && weatherData == null) {
                 HomeShimmerLoading()
             } else if (error != null) {
@@ -91,6 +95,7 @@ fun FavoriteDetailsScreen(
                     )
                 }
             }
+        }
         }
     }
 }

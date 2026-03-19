@@ -249,11 +249,25 @@ fun AlertsContent(
                     contentPadding = PaddingValues(bottom = 100.dp)
                 ) {
                     items(alerts, key = { it.id }) { alert ->
-                        AlertItemCard(
-                            alert = alert,
-                            onDelete = { onDeleteAlertClicked(alert) },
-                            onUpdate = { onUpdateAlert(it) }
-                        )
+                        var isVisible by remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) { isVisible = true }
+                        
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = isVisible,
+                            enter = androidx.compose.animation.scaleIn(
+                                initialScale = 0.8f,
+                                animationSpec = androidx.compose.animation.core.spring(
+                                    dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                                    stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+                                )
+                            ) + androidx.compose.animation.fadeIn()
+                        ) {
+                            AlertItemCard(
+                                alert = alert,
+                                onDelete = { onDeleteAlertClicked(alert) },
+                                onUpdate = { onUpdateAlert(it) }
+                            )
+                        }
                     }
                 }
             }

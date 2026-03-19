@@ -21,7 +21,7 @@ object LocationUtils {
     suspend fun getCurrentLocation(
         fusedLocationClient: FusedLocationProviderClient
     ): Location? {
-        val lastLocation = suspendCancellableCoroutine<Location?> { cont ->
+        val lastLocation = suspendCancellableCoroutine { cont ->
             fusedLocationClient.lastLocation.addOnCompleteListener { task ->
                 if (task.isSuccessful && task.result != null) {
                     cont.resume(task.result)
