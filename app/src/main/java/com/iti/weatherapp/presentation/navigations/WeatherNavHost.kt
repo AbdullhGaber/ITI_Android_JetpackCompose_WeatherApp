@@ -5,11 +5,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.iti.weatherapp.R
 import com.iti.weatherapp.presentation.MainViewModel
 import com.iti.weatherapp.presentation.screens.alerts.AlertsScreen
 import com.iti.weatherapp.presentation.screens.favorites.FavoriteDetailsScreen
@@ -75,6 +77,7 @@ fun WeatherNavHost(
                     initialLat = customLocation.first,
                     initialLon = customLocation.second
                 ),
+                markerPainter = painterResource(R.drawable.location_pin_ic),
                 onLocationSelected = { pickedLocation ->
                     if (args.isForFavorites) {
                         if (pickedLocation.cityName.isNullOrBlank()) {
