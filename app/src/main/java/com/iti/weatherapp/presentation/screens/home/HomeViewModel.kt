@@ -36,26 +36,22 @@ class HomeViewModel @Inject constructor(
     val customMapLocationFlow = settingsPreferences.customMapLocationFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Pair(31.2001, 29.9187))
 
-    private val _tempUnit = mutableStateOf("metric")
-    val tempUnit: State<String> = _tempUnit
+    val tempUnit = settingsPreferences.tempUnitFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "metric")
     
-    private val _windUnit = mutableStateOf("meter_sec")
-    val windUnit: State<String> = _windUnit
+    val windUnit = settingsPreferences.windUnitFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "meter_sec")
 
     fun getWeatherData(lat: Double, lon: Double) {
         _isLoading.value = true
         viewModelScope.launch {
-            _tempUnit.value = settingsPreferences.tempUnitFlow.first()
-            _windUnit.value = settingsPreferences.windUnitFlow.first()
-            val units = _tempUnit.value
             val language = settingsPreferences.languageFlow.first()
 
-            repository.getWeatherForecast(lat, lon, units, language).collect { state ->
+            repository.getWeatherForecast(lat, lon, "metric", language).collect { state ->
                 when (state) {
                     is ApiState.Loading -> {
                         _isLoading.value = true
                         _error.value = null
-                        _weatherData.value = null
                     }
                     is ApiState.Error -> {
                         _isLoading.value = false
@@ -71,5 +67,16 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun setLocationError() {
+        _isLoading.value = false
+        _error.value = "location"
+        _weatherData.value = null
+    }
+
+    fun setLocationLoading() {
+        _isLoading.value = true
+        _error.value = null
     }
 }

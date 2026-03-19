@@ -19,8 +19,9 @@ import com.iti.weatherapp.presentation.utils.WeatherFormatters
 
 
 @Composable
-fun HourlyItem(item: ForecastItem, tempUnitSuffix: String, timezoneOffset: Int, isFirstItem: Boolean) {
-    val formattedTemp = WeatherFormatters.formatLocalizedNumber(item.mainMetrics.temp.toInt())
+fun HourlyItem(item: ForecastItem, tempUnitPref: String, tempUnitSuffix: String, timezoneOffset: Int, isFirstItem: Boolean) {
+    val convertedTemp = WeatherFormatters.getConvertedTemperature(item.mainMetrics.temp, tempUnitPref)
+    val formattedTemp = WeatherFormatters.formatLocalizedNumber(convertedTemp.toInt())
 
     Column(
         modifier = Modifier

@@ -26,11 +26,13 @@ fun DailyItem(
     windUnitSuffix: String,
     timezoneOffset: Int
 ) {
-    val accurateWindSpeedRaw = WeatherFormatters.getConvertedWindSpeed(item.windSpeed, tempUnitPref, windUnitPref).toLong()
+    val accurateWindSpeedRaw = WeatherFormatters.getConvertedWindSpeed(item.windSpeed, windUnitPref).toLong()
 
     val formattedWindSpeed = WeatherFormatters.formatLocalizedNumber(accurateWindSpeedRaw)
-    val formattedMaxTemp = WeatherFormatters.formatLocalizedNumber(item.maxTemp)
-    val formattedMinTemp = WeatherFormatters.formatLocalizedNumber(item.minTemp)
+    val convertedMaxTemp = WeatherFormatters.getConvertedTemperature(item.maxTemp, tempUnitPref)
+    val convertedMinTemp = WeatherFormatters.getConvertedTemperature(item.minTemp, tempUnitPref)
+    val formattedMaxTemp = WeatherFormatters.formatLocalizedNumber(convertedMaxTemp.toInt())
+    val formattedMinTemp = WeatherFormatters.formatLocalizedNumber(convertedMinTemp.toInt())
     val formattedHumidity = WeatherFormatters.formatLocalizedNumber(item.humidity)
 
     Card(

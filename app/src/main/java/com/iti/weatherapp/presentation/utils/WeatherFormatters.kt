@@ -76,8 +76,8 @@ object WeatherFormatters {
                 instant.atZone(zoneOffset).format(formatter) == "12"
             } ?: dayItems.first()
 
-            val minTemp = dayItems.minOf { it.mainMetrics.tempMin }.toInt()
-            val maxTemp = dayItems.maxOf { it.mainMetrics.tempMax }.toInt()
+            val minTemp = dayItems.minOf { it.mainMetrics.tempMin }
+            val maxTemp = dayItems.maxOf { it.mainMetrics.tempMax }
 
             DailyForecastItem(
                 timestamp = noonItem.timestamp,
@@ -108,12 +108,18 @@ object WeatherFormatters {
         }
     }
 
-    fun getConvertedWindSpeed(apiSpeed: Double, tempUnitPreference: String, windUnitPreference: String): Double {
-        val apiGaveMph = tempUnitPreference == "imperial"
-        return when {
-            apiGaveMph && windUnitPreference == "meter_sec" -> apiSpeed * 0.44704
-            !apiGaveMph && windUnitPreference == "miles_hour" -> apiSpeed * 2.23694
-            else -> apiSpeed
+    fun getConvertedWindSpeed(metricSpeed: Double, windUnitPreference: String): Double {
+        return when (windUnitPreference) {
+            "miles_hour" -> metricSpeed * 2.23694
+            else -> metricSpeed
+        }
+    }
+
+    fun getConvertedTemperature(metricTemp: Double, tempUnitPreference: String): Double {
+        return when (tempUnitPreference) {
+            "imperial" -> (metricTemp * 9 / 5) + 32
+            "standard" -> metricTemp + 273.15
+            else -> metricTemp
         }
     }
 
@@ -129,8 +135,8 @@ object WeatherFormatters {
 
 data class DailyForecastItem(
     val timestamp: Long,
-    val minTemp: Int,
-    val maxTemp: Int,
+    val minTemp: Double,
+    val maxTemp: Double,
     val iconCode: String,
     val description: String,
     val humidity: Int,

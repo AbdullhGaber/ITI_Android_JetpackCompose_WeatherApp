@@ -56,23 +56,25 @@ fun HomeScreen(
     val isLoading = viewModel.isLoading.value
     val error = viewModel.error.value
     val weatherData = viewModel.weatherData.value
-    val tempUnitSuffix = WeatherFormatters.getTempSuffix(viewModel.tempUnit.value)
-    val windUnitSuffix =  WeatherFormatters.getWindSuffix(context, viewModel.windUnit.value)
 
-    val tempUnitPref = viewModel.tempUnit.value
-    val windUnitPref = viewModel.windUnit.value
+    val tempUnitPref by viewModel.tempUnit.collectAsState()
+    val windUnitPref by viewModel.windUnit.collectAsState()
+
+    val tempUnitSuffix = WeatherFormatters.getTempSuffix(tempUnitPref)
+    val windUnitSuffix =  WeatherFormatters.getWindSuffix(context, windUnitPref)
     val scope = rememberCoroutineScope()
 
     var showPermissionError by remember { mutableStateOf(false) }
     val fallBackMessage = stringResource(R.string.fallback_called)
 
     val fetchGpsLocation: () -> Unit = {
+        viewModel.setLocationLoading()
         scope.launch {
             val location = LocationUtils.getCurrentLocation(fusedLocationClient)
             if (location != null) {
                 viewModel.getWeatherData(location.latitude, location.longitude)
             } else {
-                viewModel.getWeatherData(31.2001, 29.9187)
+                viewModel.setLocationError()
                 Toast.makeText(context, fallBackMessage, Toast.LENGTH_SHORT).show()
             }
         }
@@ -113,7 +115,9 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(locationMethod, customLocation) {
+    val customLocationKey = if (locationMethod == "map") customLocation else null
+
+    LaunchedEffect(locationMethod, customLocationKey) {
         triggerWeatherUpdate()
     }
 
@@ -140,6 +144,15 @@ fun HomeScreen(
         }
         else if (isLoading && weatherData == null) {
             HomeShimmerLoading()
+        }
+        else if (error == "location") {
+            AnimatedActionState(
+                lottieResId = R.raw.no_location,
+                title = stringResource(R.string.location_error_title),
+                description = stringResource(R.string.location_error_desc),
+                buttonText = stringResource(R.string.retry),
+                onActionClick = { triggerWeatherUpdate() }
+            )
         }
         else if (error != null) {
             AnimatedActionState(
@@ -199,7 +212,7 @@ fun HomeContent(
         ) {
             item { HeaderSection(forecast.city?.name ?: "City", exactCurrentTimeSeconds, timezoneOffset) }
             item { MainWeatherCard(currentForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset) }
-            item { HourlyForecastSection(forecast.forecastList.take(8), tempUnitSuffix, timezoneOffset) }
+            item { HourlyForecastSection(forecast.forecastList.take(8), tempUnitPref, tempUnitSuffix, timezoneOffset) }
             item { DailyForecastSection(dailyForecast, tempUnitPref, windUnitPref, tempUnitSuffix, windUnitSuffix, timezoneOffset) }
         }
     }
@@ -234,10 +247,11 @@ fun MainWeatherCard(
     windUnitSuffix: String,
     timezoneOffset: Int
 ){
-    val accurateWindSpeedRaw = WeatherFormatters.getConvertedWindSpeed(forecast.wind.speed, tempUnitPref, windUnitPref).toLong()
+    val accurateWindSpeedRaw = WeatherFormatters.getConvertedWindSpeed(forecast.wind.speed, windUnitPref).toLong()
     val formattedWindSpeed = WeatherFormatters.formatLocalizedNumber(accurateWindSpeedRaw)
 
-    val formattedTemp = WeatherFormatters.formatLocalizedNumber(forecast.mainMetrics.temp.toInt())
+    val convertedTemp = WeatherFormatters.getConvertedTemperature(forecast.mainMetrics.temp, tempUnitPref)
+    val formattedTemp = WeatherFormatters.formatLocalizedNumber(convertedTemp.toInt())
     val formattedHumidity = WeatherFormatters.formatLocalizedNumber(forecast.mainMetrics.humidity)
     val formattedPressure = WeatherFormatters.formatLocalizedNumber(forecast.mainMetrics.pressure)
     val formattedClouds = WeatherFormatters.formatLocalizedNumber(forecast.clouds.cloudiness)

@@ -81,4 +81,6 @@
     <string name="location_permission_title">Location Required</string>
     <string name="location_permission_desc">We need your location permission to fetch accurate, real-time weather data for your area.</string>
     <string name="open_settings">Open Settings</string>
+    <string name="location_error_title">Location Not Found</string>
+    <string name="location_error_desc">Could not determine your current location. Please ensure location services are enabled and try again.</string>
 </resources>

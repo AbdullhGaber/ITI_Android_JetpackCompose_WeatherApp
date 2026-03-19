@@ -82,4 +82,6 @@
     <string name="location_permission_title">الموقع مطلوب</string>
     <string name="location_permission_desc">نحتاج إلى إذن الموقع الخاص بك لجلب بيانات الطقس الدقيقة في الوقت الفعلي لمنطقتك.</string>
     <string name="open_settings">فتح الإعدادات</string>
+    <string name="location_error_title">لم يتم العثور على الموقع</string>
+    <string name="location_error_desc">تعذر تحديد موقعك الحالي. يرجى التأكد من تفعيل خدمات الموقع والمحاولة مرة أخرى.</string>
 </resources>

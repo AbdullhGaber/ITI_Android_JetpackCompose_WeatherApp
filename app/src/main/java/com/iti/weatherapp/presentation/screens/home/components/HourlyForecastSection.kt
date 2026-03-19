@@ -15,7 +15,7 @@ import com.iti.weatherapp.data.models.ForecastItem
 
 
 @Composable
-fun HourlyForecastSection(hourlyItems: List<ForecastItem>, tempUnitSuffix: String, timezoneOffset: Int) {
+fun HourlyForecastSection(hourlyItems: List<ForecastItem>, tempUnitPref: String, tempUnitSuffix: String, timezoneOffset: Int) {
     val firstItem = hourlyItems.firstOrNull()
 
     Column {
@@ -28,6 +28,7 @@ fun HourlyForecastSection(hourlyItems: List<ForecastItem>, tempUnitSuffix: Strin
             items(hourlyItems) { item ->
                 HourlyItem(
                     item = item,
+                    tempUnitPref = tempUnitPref,
                     tempUnitSuffix = tempUnitSuffix,
                     timezoneOffset = timezoneOffset,
                     isFirstItem = (item == firstItem)
