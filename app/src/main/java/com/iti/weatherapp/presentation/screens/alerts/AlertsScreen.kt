@@ -12,6 +12,9 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -252,13 +255,13 @@ fun AlertsContent(
                         var isVisible by remember { mutableStateOf(false) }
                         LaunchedEffect(Unit) { isVisible = true }
                         
-                        androidx.compose.animation.AnimatedVisibility(
+                        AnimatedVisibility(
                             visible = isVisible,
                             enter = androidx.compose.animation.scaleIn(
                                 initialScale = 0.8f,
-                                animationSpec = androidx.compose.animation.core.spring(
-                                    dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
-                                    stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
                                 )
                             ) + androidx.compose.animation.fadeIn()
                         ) {

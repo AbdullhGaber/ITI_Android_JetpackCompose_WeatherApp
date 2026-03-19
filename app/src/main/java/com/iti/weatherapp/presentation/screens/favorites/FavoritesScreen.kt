@@ -1,6 +1,9 @@
 package com.iti.weatherapp.presentation.screens.favorites
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -110,13 +113,13 @@ fun FavoritesContent(
                         var isVisible by remember { mutableStateOf(false) }
                         LaunchedEffect(Unit) { isVisible = true }
                         
-                        androidx.compose.animation.AnimatedVisibility(
+                        AnimatedVisibility(
                             visible = isVisible,
                             enter = androidx.compose.animation.scaleIn(
                                 initialScale = 0.8f,
-                                animationSpec = androidx.compose.animation.core.spring(
-                                    dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
-                                    stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
                                 )
                             ) + androidx.compose.animation.fadeIn()
                         ) {
