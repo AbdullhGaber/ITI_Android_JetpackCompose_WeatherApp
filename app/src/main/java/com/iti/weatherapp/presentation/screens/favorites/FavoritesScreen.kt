@@ -9,19 +9,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.iti.weatherapp.R
+import com.iti.weatherapp.data.local.db.entities.FavoriteLocation
 import com.iti.weatherapp.presentation.LocalBottomPadding
+import com.iti.weatherapp.presentation.components.DeleteConfirmationDialog
 import com.iti.weatherapp.presentation.components.LottieIconTextView
 import com.iti.weatherapp.presentation.screens.favorites.components.FavoriteItemCard
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
     viewModel: FavoritesViewModel = hiltViewModel(),
@@ -31,7 +34,34 @@ fun FavoritesScreen(
     val favorites by viewModel.favoritesList.collectAsState()
     val dynamicBottomPadding = LocalBottomPadding.current
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    FavoritesContent(
+        favorites = favorites,
+        dynamicBottomPadding = dynamicBottomPadding,
+        onNavigateToMap = onNavigateToMap,
+        onNavigateToDetails = onNavigateToDetails,
+        onDeleteClick = { viewModel.triggerDeleteDialog(it) }
+    )
+
+    if (viewModel.showDeleteDialog) {
+        DeleteConfirmationDialog(
+            title = stringResource(R.string.delete_favorite_title),
+            message = stringResource(R.string.delete_favorite_message),
+            lottieResId = R.raw.delete_anim,
+            onConfirm = { viewModel.confirmDelete() },
+            onDismiss = { viewModel.dismissDeleteDialog() }
+        )
+    }
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun FavoritesContent(
+    favorites: List<FavoriteLocation>,
+    dynamicBottomPadding: Dp,
+    onNavigateToMap: () -> Unit,
+    onNavigateToDetails: (Double, Double, String) -> Unit,
+    onDeleteClick: (FavoriteLocation) -> Unit
+){
     Scaffold(
         contentWindowInsets = WindowInsets(bottom = 0.dp),
         floatingActionButton = {
@@ -61,11 +91,13 @@ fun FavoritesScreen(
             )
 
             if (favorites.isEmpty()) {
-                LottieIconTextView(
-                    animationResId = R.raw.no_favorties,
-                    message = stringResource(R.string.no_favorites),
-                    modifier = Modifier.weight(1f)
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    LottieIconTextView(
+                        animationResId = R.raw.no_favorties,
+                        message = stringResource(R.string.no_favorites),
+                        modifier = Modifier.align(Center)
+                    )
+                }
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -78,7 +110,7 @@ fun FavoritesScreen(
                         FavoriteItemCard(
                             location = location,
                             onClick = { onNavigateToDetails(location.latitude, location.longitude, location.cityName) },
-                            onDelete = { viewModel.removeFavorite(location) }
+                            onDelete = { onDeleteClick(location) }
                         )
                     }
                 }

@@ -1,6 +1,9 @@
 package com.iti.weatherapp.presentation.screens.alerts
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.weatherapp.data.local.db.entities.WeatherAlert
@@ -25,26 +28,68 @@ class AlertsViewModel @Inject constructor(
     private val settingsPreferences: SettingsPreferences,
     private val oemPermissionManager: OemPermissionManager
 ) : ViewModel() {
+
     val alertsList: StateFlow<List<WeatherAlert>> = repository.getAllWeatherAlerts()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val hasAskedAutoStart : StateFlow<Boolean> = settingsPreferences.hasAskedAutoStartFlow
+    private val hasAskedAutoStart: StateFlow<Boolean> = settingsPreferences.hasAskedAutoStartFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    val hasAskedOemPermission : StateFlow<Boolean> = settingsPreferences.hasAskedOemPermissionFlow
+    private val hasAskedOemPermission: StateFlow<Boolean> = settingsPreferences.hasAskedOemPermissionFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    var showBottomSheet by mutableStateOf(false)
+        private set
+
+    var showDeleteDialog by mutableStateOf(false)
+        private set
+
+    var alertToDelete by mutableStateOf<WeatherAlert?>(null)
+        private set
+
+    var pendingAlertToSave by mutableStateOf<WeatherAlert?>(null)
+        private set
+
+    var activeStrategy by mutableStateOf<OemPermissionStrategy?>(null)
+        private set
+
+
+    fun openBottomSheet() { showBottomSheet = true }
+    fun closeBottomSheet() { showBottomSheet = false }
+
+    fun triggerDeleteDialog(alert: WeatherAlert) {
+        alertToDelete = alert
+        showDeleteDialog = true
+    }
+
+    fun dismissDeleteDialog() {
+        showDeleteDialog = false
+        alertToDelete = null
+    }
+
+    fun confirmDelete() {
+        alertToDelete?.let { deleteAlert(it) }
+        dismissDeleteDialog()
+    }
+
+    fun setPendingStrategy(alert: WeatherAlert?, strategy: OemPermissionStrategy?) {
+        pendingAlertToSave = alert
+        activeStrategy = strategy
+    }
+
+    fun clearPendingStrategy() {
+        pendingAlertToSave = null
+        activeStrategy = null
+    }
 
     private fun markAutoStartAsAsked() {
-        viewModelScope.launch {
-            settingsPreferences.saveAutoStartAsked(true)
-        }
+        viewModelScope.launch { settingsPreferences.saveAutoStartAsked(true) }
     }
 
     private fun markOemPermissionAsAsked() {
-        viewModelScope.launch {
-            settingsPreferences.saveOemPermissionAsked(true)
-        }
+        viewModelScope.launch { settingsPreferences.saveOemPermissionAsked(true) }
     }
+
     fun getRequiredPermissionStrategy(context: Context): OemPermissionStrategy? {
         return oemPermissionManager.getRequiredPermissionStrategy(
             context = context,
@@ -55,15 +100,12 @@ class AlertsViewModel @Inject constructor(
 
     fun markStrategyAsAsked(strategy: OemPermissionStrategy) {
         oemPermissionManager.markAsAsked(strategy)
-        when(strategy){
-            is MiuiAutoStartStrategy -> {
-                markAutoStartAsAsked()
-            }
-            is MiuiSpecialPermissionStrategy -> {
-                markOemPermissionAsAsked()
-            }
+        when (strategy) {
+            is MiuiAutoStartStrategy -> markAutoStartAsAsked()
+            is MiuiSpecialPermissionStrategy -> markOemPermissionAsAsked()
         }
     }
+
 
     fun saveAlert(alert: WeatherAlert) {
         viewModelScope.launch {

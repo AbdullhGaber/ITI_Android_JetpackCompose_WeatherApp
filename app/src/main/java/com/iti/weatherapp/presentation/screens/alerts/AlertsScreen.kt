@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AddAlert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.Center
@@ -26,20 +26,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.iti.weatherapp.R
+import com.iti.weatherapp.data.local.db.entities.AlertType
+import com.iti.weatherapp.data.local.db.entities.WeatherAlert
 import com.iti.weatherapp.presentation.LocalBottomPadding
+import com.iti.weatherapp.presentation.components.DeleteConfirmationDialog
+import com.iti.weatherapp.presentation.components.LottieIconTextView
 import com.iti.weatherapp.presentation.screens.alerts.components.AddAlertBottomSheetContent
 import com.iti.weatherapp.presentation.screens.alerts.components.AlertItemCard
 import java.util.Calendar
-import androidx.core.net.toUri
-import com.iti.weatherapp.presentation.components.LottieIconTextView
-import com.iti.weatherapp.data.local.db.entities.AlertType
-import com.iti.weatherapp.data.local.db.entities.WeatherAlert
-import com.iti.weatherapp.presentation.utils.oem.OemPermissionStrategy
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,19 +49,16 @@ fun AlertsScreen(
     viewModel: AlertsViewModel = hiltViewModel()
 ) {
     val alerts by viewModel.alertsList.collectAsState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val dynamicBottomPadding = LocalBottomPadding.current
     val context = LocalContext.current
-    var activeStrategy by remember { mutableStateOf<OemPermissionStrategy?>(null) }
-
-    var pendingAlertToSave by remember { mutableStateOf<WeatherAlert?>(null) }
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            showBottomSheet = true
+            viewModel.openBottomSheet()
         } else {
             @SuppressLint("LocalContextGetResourceValueCall")
             Toast.makeText(context, context.getString(R.string.notification_permission_is_required_to_show_alerts), Toast.LENGTH_LONG).show()
@@ -72,6 +71,8 @@ fun AlertsScreen(
         if (Settings.canDrawOverlays(context)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                viewModel.openBottomSheet()
             }
         } else {
             Toast.makeText(context, "Overlay permission is required for Alarms.", Toast.LENGTH_SHORT).show()
@@ -81,47 +82,45 @@ fun AlertsScreen(
     val showOnLockScreenPermission = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) {
-        activeStrategy?.let { viewModel.markStrategyAsAsked(it) }
+        val strategy = viewModel.activeStrategy
+        val alert = viewModel.pendingAlertToSave
 
-        val isGranted = activeStrategy?.isPermissionGranted(context) ?: false
+        strategy?.let { viewModel.markStrategyAsAsked(it) }
 
-        if (isGranted) {
-            pendingAlertToSave?.let {
+        if (strategy?.isPermissionGranted(context) == true) {
+            alert?.let {
                 viewModel.saveAlert(it)
-                showBottomSheet = false
+                viewModel.closeBottomSheet()
             }
         } else {
             Toast.makeText(context, "Permission is required to wake the screen for alarms.", Toast.LENGTH_LONG).show()
         }
-        pendingAlertToSave = null
-        activeStrategy = null
+        viewModel.clearPendingStrategy()
     }
 
     val autostartBackgroundPermission = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) {
-        activeStrategy?.let { viewModel.markStrategyAsAsked(it) }
+        val strategy = viewModel.activeStrategy
+        val alert = viewModel.pendingAlertToSave
 
-        val isGranted = activeStrategy?.isPermissionGranted(context) ?: false
+        strategy?.let { viewModel.markStrategyAsAsked(it) }
 
-        if (isGranted) {
+        if (strategy?.isPermissionGranted(context) == true) {
             val nextStrategy = viewModel.getRequiredPermissionStrategy(context)
-
             if (nextStrategy != null) {
-                activeStrategy = nextStrategy
+                viewModel.setPendingStrategy(alert, nextStrategy)
                 showOnLockScreenPermission.launch(nextStrategy.getPermissionIntent(context))
             } else {
-                pendingAlertToSave?.let {
+                alert?.let {
                     viewModel.saveAlert(it)
-                    showBottomSheet = false
+                    viewModel.closeBottomSheet()
                 }
-                pendingAlertToSave = null
-                activeStrategy = null
+                viewModel.clearPendingStrategy()
             }
         } else {
             Toast.makeText(context, "Permission is required to wake the screen for alarms.", Toast.LENGTH_LONG).show()
-            pendingAlertToSave = null
-            activeStrategy = null
+            viewModel.clearPendingStrategy()
         }
     }
 
@@ -134,12 +133,12 @@ fun AlertsScreen(
                 ) == PackageManager.PERMISSION_GRANTED
 
                 if (hasPermission) {
-                    showBottomSheet = true
+                    viewModel.openBottomSheet()
                 } else {
                     notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
             } else {
-                showBottomSheet = true
+                viewModel.openBottomSheet()
             }
         } else {
             val intent = Intent(
@@ -150,7 +149,60 @@ fun AlertsScreen(
         }
     }
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    AlertsContent(
+        alerts = alerts,
+        dynamicBottomPadding = dynamicBottomPadding,
+        onAddAlertClicked = onAddAlertClicked,
+        onDeleteAlertClicked = { viewModel.triggerDeleteDialog(it) },
+        onUpdateAlert = { viewModel.updateAlert(it) }
+    )
+
+    if (viewModel.showDeleteDialog) {
+        DeleteConfirmationDialog(
+            title = stringResource(R.string.delete_alert_title),
+            message = stringResource(R.string.delete_alert_message),
+            lottieResId = R.raw.delete_anim,
+            onConfirm = { viewModel.confirmDelete() },
+            onDismiss = { viewModel.dismissDeleteDialog() }
+        )
+    }
+
+    if (viewModel.showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.closeBottomSheet() },
+            sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            AddAlertBottomSheetContent(
+                onSave = { newAlert ->
+                    if (newAlert.alertType == AlertType.ALARM) {
+                        val strategy = viewModel.getRequiredPermissionStrategy(context)
+
+                        if (strategy != null) {
+                            viewModel.setPendingStrategy(newAlert, strategy)
+                            autostartBackgroundPermission.launch(strategy.getPermissionIntent(context))
+                            Toast.makeText(context, strategy.getToastMessage(context), Toast.LENGTH_LONG).show()
+                            return@AddAlertBottomSheetContent
+                        }
+                    }
+                    viewModel.saveAlert(newAlert)
+                    viewModel.closeBottomSheet()
+                },
+                onCancel = { viewModel.closeBottomSheet() }
+            )
+        }
+    }
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun AlertsContent(
+    alerts: List<WeatherAlert>,
+    dynamicBottomPadding: Dp,
+    onAddAlertClicked: () -> Unit,
+    onDeleteAlertClicked: (WeatherAlert) -> Unit,
+    onUpdateAlert: (WeatherAlert) -> Unit
+) {
     Scaffold(
         contentWindowInsets = WindowInsets(bottom = 0.dp),
         floatingActionButton = {
@@ -180,7 +232,7 @@ fun AlertsScreen(
             )
 
             if (alerts.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize()){
+                Box(modifier = Modifier.fillMaxSize()) {
                     LottieIconTextView(
                         animationResId = R.raw.no_alerts,
                         message = stringResource(R.string.no_alerts),
@@ -195,40 +247,12 @@ fun AlertsScreen(
                     items(alerts, key = { it.id }) { alert ->
                         AlertItemCard(
                             alert = alert,
-                            onDelete = { viewModel.deleteAlert(alert) },
-                            onUpdate = { updatedAlert -> viewModel.updateAlert(alert = updatedAlert) }
+                            onDelete = { onDeleteAlertClicked(alert) },
+                            onUpdate = { onUpdateAlert(it) }
                         )
                     }
                 }
             }
-        }
-    }
-
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
-            sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.surface
-        ) {
-            AddAlertBottomSheetContent(
-                onSave = { newAlert ->
-                    if (newAlert.alertType == AlertType.ALARM) {
-                        val strategy = viewModel.getRequiredPermissionStrategy(context)
-
-                        if (strategy != null) {
-                            pendingAlertToSave = newAlert
-                            activeStrategy = strategy
-                            autostartBackgroundPermission.launch(strategy.getPermissionIntent(context))
-                            Toast.makeText(context, strategy.getToastMessage(context), Toast.LENGTH_LONG).show()
-                            return@AddAlertBottomSheetContent
-                        }
-                    }
-
-                    viewModel.saveAlert(newAlert)
-                    showBottomSheet = false
-                },
-                onCancel = { showBottomSheet = false }
-            )
         }
     }
 }

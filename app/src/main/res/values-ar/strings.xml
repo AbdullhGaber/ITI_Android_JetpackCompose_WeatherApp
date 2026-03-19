@@ -72,4 +72,9 @@
     <string name="error_start_time_past">لا يمكن أن يكون وقت البدء في الماضي.</string>
     <string name="error_end_time_before_start">يجب أن يكون وقت الانتهاء بعد وقت البدء.</string>
     <string name="error_end_time_past">لا يمكن أن يكون وقت الانتهاء في الماضي.</string>
+    <string name="delete">حذف</string>
+    <string name="delete_alert_title">حذف التنبيه؟</string>
+    <string name="delete_alert_message">هل أنت متأكد أنك تريد حذف تنبيه الطقس هذا؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="delete_favorite_title">إزالة من المفضلة؟</string>
+    <string name="delete_favorite_message">هل أنت متأكد أنك تريد إزالة هذا الموقع من قائمة المفضلة لديك؟</string>
 </resources>
