@@ -38,6 +38,12 @@ class AlertsViewModel @Inject constructor(
     private val hasAskedOemPermission: StateFlow<Boolean> = settingsPreferences.hasAskedOemPermissionFlow
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    val tempUnit: StateFlow<String> = settingsPreferences.tempUnitFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "metric")
+
+    val windUnit: StateFlow<String> = settingsPreferences.windUnitFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "meter_sec")
+
     var showBottomSheet by mutableStateOf(false)
         private set
 

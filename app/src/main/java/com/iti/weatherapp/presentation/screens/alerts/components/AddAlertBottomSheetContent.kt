@@ -37,10 +37,11 @@ import com.iti.weatherapp.presentation.screens.alerts.showNativeDateTimePicker
 import com.iti.weatherapp.presentation.utils.WeatherFormatters
 import com.iti.weatherapp.presentation.utils.validation.AlertValidator
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddAlertBottomSheetContent(
+    tempUnit: String,
+    windUnit: String,
     onSave: (WeatherAlert) -> Unit,
     onCancel: () -> Unit
 ) {
@@ -48,7 +49,33 @@ fun AddAlertBottomSheetContent(
 
     var selectedSoundUri by remember { mutableStateOf<String?>(null) }
     var selectedSoundName by remember { mutableStateOf("Default Sound") }
-    var windThreshold by remember { mutableFloatStateOf(10f) }
+
+    val tempSymbol = WeatherFormatters.getTempSuffix(tempUnit)
+
+    val windSymbol = WeatherFormatters.getWindSuffix(context, windUnit)
+
+    val tempRange = when (tempUnit) {
+        "imperial" -> 14f..122f
+        "standard" -> 263f..323f
+        else -> -10f..50f
+    }
+
+    val windMaxLimit = when (windUnit) {
+        "miles_hour" -> 110f
+        else -> 50f
+    }
+
+    var windThreshold by remember { mutableFloatStateOf(if (windUnit == "miles_hour") 20f else 10f) }
+
+    var tempThreshold by remember {
+        mutableFloatStateOf(
+            when(tempUnit) {
+                "imperial" -> 95f
+                "standard" -> 300f
+                else -> 35f
+            }
+        )
+    }
 
     val ringtonePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -72,7 +99,6 @@ fun AddAlertBottomSheetContent(
         }
     }
 
-    // Function to trigger the intent
     fun pickRingtone() {
         val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
             putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
@@ -88,11 +114,8 @@ fun AddAlertBottomSheetContent(
     var startTime by remember { mutableLongStateOf(currentTimeSeconds) }
     var endTime by remember { mutableLongStateOf(currentTimeSeconds + 86400) }
 
-
     var selectedType by remember { mutableStateOf(AlertType.NOTIFICATION) }
-
     var selectedConditions by remember { mutableStateOf(setOf<String>()) }
-    var tempThreshold by remember { mutableFloatStateOf(35f) }
 
     val conditionsList = listOf(
         stringResource(R.string.high_temperature) to "🌡️",
@@ -155,7 +178,7 @@ fun AddAlertBottomSheetContent(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "${tempThreshold.toInt()}°C",
+                    text = "${tempThreshold.toInt()}$tempSymbol",
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -164,7 +187,7 @@ fun AddAlertBottomSheetContent(
             Slider(
                 value = tempThreshold,
                 onValueChange = { tempThreshold = it },
-                valueRange = -10f..50f,
+                valueRange = tempRange, // DYNAMIC BOUNDS
                 colors = SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.primary,
                     activeTrackColor = MaterialTheme.colorScheme.primary,
@@ -173,17 +196,18 @@ fun AddAlertBottomSheetContent(
             )
 
             Text(
-                text = stringResource(R.string.wind_speed_threshold),
+                text = "${stringResource(R.string.wind_speed_threshold)} ($windSymbol)",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             WindSpeedGauge(
+                modifier = Modifier.padding(horizontal = 32.dp),
                 currentValue = windThreshold,
-                maxValue = 50f,
+                maxValue = windMaxLimit,
+                windSymbol = windSymbol,
                 onValueChange = { windThreshold = it },
-                modifier = Modifier.padding(horizontal = 32.dp)
             )
         }
 

@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 fun WindSpeedGauge(
     modifier: Modifier = Modifier,
     currentValue: Float,
+    windSymbol: String,
     maxValue: Float = 50f,
     onValueChange: (Float) -> Unit
 ) {
@@ -61,7 +62,7 @@ fun WindSpeedGauge(
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val strokeWidth = 30.dp.toPx()
                 val radius = size.width / 2 - strokeWidth / 2
-                val center = Offset(size.width / 2, size.height) // Bottom center
+                val center = Offset(size.width / 2, size.height)
 
                 drawArc(
                     color = surfaceVariant,
@@ -115,7 +116,7 @@ fun WindSpeedGauge(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "m/s",
+                    text = windSymbol,
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -178,6 +179,7 @@ private fun PreviewWindSpeedGauge() {
         val cur = remember { mutableFloatStateOf(0f) }
         WindSpeedGauge(
             modifier = Modifier,
+            windSymbol = "m/s",
             currentValue = cur.floatValue,
             onValueChange = {cur.floatValue = it}
         )

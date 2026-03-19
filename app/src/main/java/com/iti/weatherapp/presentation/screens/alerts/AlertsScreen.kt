@@ -49,6 +49,8 @@ fun AlertsScreen(
     viewModel: AlertsViewModel = hiltViewModel()
 ) {
     val alerts by viewModel.alertsList.collectAsState()
+    val tempUnit by viewModel.tempUnit.collectAsState()
+    val windUnit by viewModel.windUnit.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val dynamicBottomPadding = LocalBottomPadding.current
@@ -174,6 +176,8 @@ fun AlertsScreen(
             containerColor = MaterialTheme.colorScheme.surface
         ) {
             AddAlertBottomSheetContent(
+                tempUnit = tempUnit,
+                windUnit = windUnit,
                 onSave = { newAlert ->
                     if (newAlert.alertType == AlertType.ALARM) {
                         val strategy = viewModel.getRequiredPermissionStrategy(context)
