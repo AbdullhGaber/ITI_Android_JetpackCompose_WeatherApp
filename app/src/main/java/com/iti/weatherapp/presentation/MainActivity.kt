@@ -67,6 +67,12 @@ class MainActivity : AppCompatActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
                 setTurnScreenOn(true)
+            } else {
+                @Suppress("DEPRECATION")
+                window.addFlags(
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                )
             }
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
@@ -79,6 +85,9 @@ class MainActivity : AppCompatActivity() {
             val appTheme by viewModel.appTheme.collectAsState(initial = AppTheme.SYSTEM_DEFAULT)
 
             if (isAlarmFiring && alertId != -1) {
+                LaunchedEffect(Unit) {
+                    keepSplash = false
+                }
                 WeatherAppTheme(appTheme = appTheme){
                     AlarmRingingScreen(
                         alertId = alertId,
