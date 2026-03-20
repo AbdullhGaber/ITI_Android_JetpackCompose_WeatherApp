@@ -60,6 +60,13 @@ The app is built using the latest Android standards:
   <img src="assets/home2.jpeg" width="170" />
   <img src="assets/home_ar.jpeg" width="170" />
 </p>
+![add_alert_2](https://github.com/user-attachments/assets/3a02d7a7-1ba8-4160-98da-28b268cb716e)
+![add_alert_1](https://github.com/user-attachments/assets/e3c7ac9d-f366-479b-8d51-1246ee4281a1)
+![show_alerts](https://github.com/user-attachments/assets/43761152-55d9-4e09-95f8-ba9e2e107abc)
+![settings_2](https://github.com/user-attachments/assets/47ecbacf-94e4-4e93-8998-da380a4807f6)
+![settings_1](https://github.com/user-attachments/assets/46f23de1-d583-4ec1-937d-72492305804b)
+![home](https://github.com/user-attachments/assets/bfe7c19c-7150-494d-a4c2-23fb13dd0996)
+![favorite](https://github.com/user-attachments/assets/6869835c-2073-4a6f-b43d-09ec2535a5b0)
 
 <p float="left">
   <img src="assets/permission.jpeg" width="170" />
