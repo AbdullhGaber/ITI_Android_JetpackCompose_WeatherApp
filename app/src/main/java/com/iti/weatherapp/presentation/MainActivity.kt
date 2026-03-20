@@ -7,6 +7,7 @@ import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -54,7 +55,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        var keepSplash = true
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        splashScreen.setKeepOnScreenCondition { keepSplash }
         val isAlarmFiring = intent.getBooleanExtra("IS_ALARM_FIRING", false)
         val alertId = intent.getIntExtra(EXTRA_ALERT_ID, -1)
 
@@ -97,6 +101,10 @@ class MainActivity : AppCompatActivity() {
                     return@setContent
                 }
 
+                LaunchedEffect(Unit) {
+                    keepSplash = false
+                }
+
                 DisposableEffect(Unit) {
                     val listener = Consumer<Intent> { newIntent ->
                         if (newIntent.getBooleanExtra(NAVIGATE_TO_ALERTS, false)) {
@@ -122,7 +130,7 @@ class MainActivity : AppCompatActivity() {
 
                 WeatherAppTheme(appTheme = appTheme){
                     val isFavoriteDetails = currentDestination?.hierarchy?.any {
-                        it.hasRoute(FavoriteDetails::class) || it.hasRoute(Onboarding::class)
+                        it.hasRoute(FavoriteDetails::class) || it.hasRoute(Onboarding::class) || it.hasRoute(com.iti.weatherapp.presentation.navigations.Splash::class)
                     } == true
                     Scaffold(
                         bottomBar = {

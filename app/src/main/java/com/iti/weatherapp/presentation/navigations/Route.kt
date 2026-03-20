@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 object Home
 @Serializable
+object Splash
+@Serializable
 object Favorites
 @Serializable
 object Alerts

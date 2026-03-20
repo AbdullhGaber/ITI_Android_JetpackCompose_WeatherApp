@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.core.splashscreen)
     ksp(libs.hilt.compiler)
 
     implementation(libs.androidx.room.runtime)

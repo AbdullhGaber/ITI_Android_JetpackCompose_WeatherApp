@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">تطبيق الطقس</string>
+    <string name="app_name">نكهة الطقس</string>
+    <string name="slogan">تذوق الأجواء.</string>
     <string name="settings_title">الإعدادات</string>
     <string name="location_settings">إعدادات الموقع</string>
     <string name="location_desc">قم بتكوين طريقة الموقع الخاصة بك. استخدم GPS لمعرفة الطقس المحلي بدقة، أو اختر موقعًا مخصصًا من الخريطة.</string>

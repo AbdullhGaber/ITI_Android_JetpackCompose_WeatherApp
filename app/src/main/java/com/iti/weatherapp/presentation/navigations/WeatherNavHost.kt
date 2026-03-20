@@ -23,6 +23,7 @@ import com.iti.weatherapp.presentation.screens.map.MapConfig
 import com.iti.weatherapp.presentation.screens.onboarding.OnboardingScreen
 import com.iti.weatherapp.presentation.screens.settings.SettingsScreen
 import com.iti.weatherapp.presentation.screens.settings.SettingsViewModel
+import com.iti.weatherapp.presentation.screens.splash.AnimatedSplashScreen
 import com.iti.weatherapp.presentation.utils.LocationUtils
 
 @Composable
@@ -39,9 +40,19 @@ fun WeatherNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination,
+        startDestination = Splash,
         modifier = modifier
     ) {
+        composable<Splash> {
+            AnimatedSplashScreen(
+                onSplashFinished = {
+                    navController.navigate(startDestination) {
+                        popUpTo(Splash) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable<Home> { HomeScreen() }
 
         composable<Favorites> {
