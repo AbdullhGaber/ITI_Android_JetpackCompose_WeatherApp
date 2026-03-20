@@ -8,5 +8,8 @@
         <item name="postSplashScreenTheme">@style/Theme.WeatherApp</item>
     </style>
 
-    <style name="Theme.WeatherApp" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="Theme.WeatherApp" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">#FFFFFF</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

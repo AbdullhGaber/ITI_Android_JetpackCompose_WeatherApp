@@ -39,6 +39,7 @@
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
+            android:configChanges="locale|layoutDirection|uiMode|screenSize|orientation|keyboardHidden|screenLayout|smallestScreenSize"
             android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
