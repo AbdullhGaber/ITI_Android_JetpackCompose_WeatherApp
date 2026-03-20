@@ -54,19 +54,19 @@ The app is built using the latest Android standards:
 ## 🖼 Screenshots
 
 <p float="left">
-  <img src="https://github.com/user-attachments/assets/9fba55b6-d9f0-4a32-bf90-e6758b67767a" width="170" />
-  <img src="https://github.com/user-attachments/assets/c4f7470b-7389-437f-8a71-3af87af9eeec" width="170" />
-  <img src="https://github.com/user-attachments/assets/9cd4ba1a-ea35-40e8-8506-38cc769345c4" width="170" />
-  <img src="https://github.com/user-attachments/assets/ceeabaf7-bd68-404c-a628-649f0d92e475" width="170" />
-  <img src="https://github.com/user-attachments/assets/456f5938-fadf-4ecf-a5a0-03a520708f59" width="170" />
+  <img src="https://github.com/user-attachments/assets/9fba55b6-d9f0-4a32-bf90-e6758b67767a" width="150" />
+  <img src="https://github.com/user-attachments/assets/c4f7470b-7389-437f-8a71-3af87af9eeec" width="150" />
+  <img src="https://github.com/user-attachments/assets/9cd4ba1a-ea35-40e8-8506-38cc769345c4" width="150" />
+  <img src="https://github.com/user-attachments/assets/ceeabaf7-bd68-404c-a628-649f0d92e475" width="150" />
+  <img src="https://github.com/user-attachments/assets/456f5938-fadf-4ecf-a5a0-03a520708f59" width="150" />
 </p>
 
 <p float="left">
-  <img src="https://github.com/user-attachments/assets/dabffe09-5559-420c-8b8e-91a3e2ca7451" width="170" />
-  <img src="https://github.com/user-attachments/assets/3f1ae54c-626b-42ed-99fd-c2ae77ef7dc9" width="170" />
-  <img src="https://github.com/user-attachments/assets/6a028b64-3ef5-4350-9abf-666b763d51f9" width="170" />
-  <img src="https://github.com/user-attachments/assets/3851b2bc-7594-4ed3-80e1-7aaf795c94b4" width="170" />
-  <img src="https://github.com/user-attachments/assets/24e1d11a-3490-433d-b6c4-62fa8a193f44" width="170" />
+  <img src="https://github.com/user-attachments/assets/dabffe09-5559-420c-8b8e-91a3e2ca7451" width="150" />
+  <img src="https://github.com/user-attachments/assets/3f1ae54c-626b-42ed-99fd-c2ae77ef7dc9" width="150" />
+  <img src="https://github.com/user-attachments/assets/6a028b64-3ef5-4350-9abf-666b763d51f9" width="150" />
+  <img src="https://github.com/user-attachments/assets/3851b2bc-7594-4ed3-80e1-7aaf795c94b4" width="150" />
+  <img src="https://github.com/user-attachments/assets/24e1d11a-3490-433d-b6c4-62fa8a193f44" width="150" />
 </p>
 
 ---
